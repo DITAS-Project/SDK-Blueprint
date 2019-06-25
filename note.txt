@@ -1,0 +1,45 @@
+
+DITAS SDK-BluePrint Generator
+
+Creare una prima versione del file di configurazione che dovrà essere
+inserito nella root di un repo
+
+- una modalità create
+	- specifica [qualocsa] e crea un git repo con una struttura predefinita
+	  di blueprint, API, datasource, eventuale Node Red
+- una modalità update
+	- riscarica il file di configurazione dal repo, lo rilegge e
+	  NON RISCRIVE il blueprint, ma se già esistente va solo a modificare
+	  le parti esplicitamente indicate nel file di configurazione, altri-
+	  menti senza problemi ne scrive nuo da zero
+
+--------------------------
+
+Nel bp_gen_vdc.cfg/bp_gen_dal.cfg
+- link a swagger file
+- lista di link alle configurazioni di data sources, 
+- indicare se viene usato un flow, che può essere Spark o Node-RED
+	- se Node-RED, indicare il path al file flows.json
+- in attesa di info su file zip Testint_Output_Data
+
+Nel blueprint_template.json
+- INTERNAL_STRUCTURE
+	- Overview
+		- name: se creato con la CLI, viene richiesto
+		- description: 
+		- tags: lista di 
+			- method_id, presi da swagger, sezione "paths", prendere
+				tutto sopprimendo il primo slash '/'
+			- tags, lista di keywords VUOTA
+	- Data_Sources: lista di configurazioni, copia e incolla, unendo 
+					file diversi
+	- Methods_Input:
+		- Methods: lista di metodi, in cui per ogni method_id è indicata
+				   una lista di data_sources
+	- Flow:
+		- source_code: prendere il file flows.json indicato in bp_gen_vdc.cfg
+	- Testing_Output_Data: lista di method_id, ognuna con una lista di
+						   url a zip files [IN ATTESA DI INFO]
+	
+
+- EXPOSED_API: copiare swagger file
