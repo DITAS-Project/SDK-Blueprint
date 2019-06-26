@@ -18,8 +18,9 @@ def extract_info_from_vdc(path):
     # Do something
     print("Doing some processing on VDC local repo...")
     blueprint = Blueprint(path)
-    blueprint.add_exposed_api()
     blueprint.add_is_tags()
+    blueprint.add_is_flow()
+    blueprint.add_exposed_api()
     blueprint.save()
 
 
@@ -65,6 +66,14 @@ if __name__ == "__main__":
     vdc_repo_path = prepare_repo_folder(vdc_url)
     repo.clone_repo(vdc_url, vdc_repo_path)
     extract_info_from_vdc(vdc_repo_path)
+
+    '''
+    TODO al momento tutte le info richieste stanno all'interno del vdc file, quando sapremo cosa fare anche per i dal
+    dovrà essere cambiata la definizione della classe blueprint e parte di questi metodi
+    Dal mio punto di vista non credo sia corretto fare extract info from... dalle diverse DAL, penso in realtà che sia
+    più corretto completare i campi che devono essere completati usando tutti i dal assieme nella classe blueprint, in 
+    questo modo sarà più semplice appendere i creare i campi del dizionario 
+    '''
 
     # If DAL URLs list is empty, then just extract DAL info from already cloned VDC repo
     if not dal_urls:
