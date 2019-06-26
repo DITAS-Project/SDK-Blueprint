@@ -2,6 +2,7 @@ import argparse
 import os
 import shutil
 from repo import repo
+from blueprint.blueprint import Blueprint
 
 '''
 due_vdc_url = 'https://github.com/DITAS-Project/DUE-VDC'
@@ -16,6 +17,10 @@ TMP_DIR = 'tmp'
 def extract_info_from_vdc(path):
     # Do something
     print("Doing some processing on VDC local repo...")
+    blueprint = Blueprint(path)
+    blueprint.add_exposed_api()
+    blueprint.add_is_tags()
+    blueprint.save()
 
 
 def extract_info_from_dal(path):
@@ -53,7 +58,7 @@ if __name__ == "__main__":
 
     # Feeling lazy, just put two URLs at random to test
     if args.e:
-        vdc_url = 'https://github.com/DITAS-Project/DUE-VDC'
+        vdc_url = 'git@github.com:caloc/ideko-copy.git'
         dal_urls = ['https://github.com/DITAS-Project/SDK-Blueprint']
 
     # Clone VDC repo and extract info to generate Blueprint
