@@ -5,7 +5,6 @@ import copy
 
 TEMPLATE_PATH = 'blueprint_template.json'
 VDC_CONFIG = 'bp_gen_vdc.cfg'
-BLUEPRINT_NAME = 'blueprint.json'
 
 # type of flows
 NODERED = 'node-red'
@@ -26,17 +25,18 @@ COOKBOOK_APPENDIX_SECTION = 'COOKBOOK_APPENDIX'
 EXPOSED_API_SECTION = 'EXPOSED_API'
 
 # const referred to config files
+BLUEPRINT = 'blueprint'
 FLOW = 'flow'
 FLOW_PLATFORM = 'platform'
 FLOW_PATH = 'source'
 SWAGGER = 'swagger'
 
-# const refered to the swagger file
+# const referred to the swagger file
 SWAGGER_PATHS = 'paths'
 
 
 class Blueprint:
-    def __init__(self, vdc_repo_path):
+    def __init__(self, vdc_repo_path, update=False):
         self.vdc_repo_path = vdc_repo_path
         ''' 
         loading template and blueprint:
@@ -50,6 +50,11 @@ class Blueprint:
         # loading vdc_config_file
         with open(self.__get_vdc_path(VDC_CONFIG)) as vdc_config:
             self.vdc_config_file = json.load(vdc_config)
+
+        # if method update the bp file is loaded from the configuration file
+        if update:
+            with open(self.__get_vdc_path(self.vdc_config_file[BLUEPRINT])) as bp_file:
+                self.bp = json.load(bp_file)
 
     def add_exposed_api(self):
         with open(self.__get_vdc_path(self.vdc_config_file[SWAGGER])) as swagger_file:
@@ -83,7 +88,7 @@ class Blueprint:
             print('Flow platform not recognized!')  # TODO forse qua bisogna lanciare una eccezione
 
     def save(self):
-        with open(self.__get_vdc_path(BLUEPRINT_NAME), 'w') as outfile:
+        with open(self.__get_vdc_path(self.vdc_config_file[BLUEPRINT]), 'w') as outfile:
             json.dump(self.bp, outfile, indent=4)
 
     def __get_vdc_path(self, filepath):

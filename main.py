@@ -17,7 +17,7 @@ TMP_DIR = 'tmp'
 def extract_info_from_vdc(path):
     # Do something
     print("Doing some processing on VDC local repo...")
-    blueprint = Blueprint(path)
+    blueprint = Blueprint(path, update)
     blueprint.add_is_tags()
     blueprint.add_is_flow()
     blueprint.add_exposed_api()
@@ -50,12 +50,16 @@ if __name__ == "__main__":
     parser.add_argument('VDC_URL', type=str, help='VDC repository URL')
     parser.add_argument('DAL_URL', type=str, nargs='*', help='List of DAL repositories URLs. '
                                                              'Assumed same URL as VDC repository if not provided')
+    parser.add_argument('-u', action='store_true', required=False, help='Update an existing blueprint with info '
+                                                                        'contained in the config files of the repos.')
+
     parser.add_argument('-e', type=str, default='bla', help='Use this option to automatically set two URLs as example')
 
     args = parser.parse_args()
 
     vdc_url = args.VDC_URL
     dal_urls = args.DAL_URL
+    update = args.u
 
     # Feeling lazy, just put two URLs at random to test
     if args.e:
