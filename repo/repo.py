@@ -4,6 +4,7 @@ import os
 import requests
 
 GH_ACCESS_FILE='github_access.json'
+GH_ORG_DITAS = 'DITAS-Project'
 
 
 # Clone repository at https_url into path folder
@@ -35,10 +36,22 @@ def load_gh_access_token():
     return access_token
 
 
-def create_private_repo(repo_name):
+def create_personal_repo(repo_name):
     access_token=load_gh_access_token()
     headers = {'Authorization': 'token ' + access_token}
     url = 'https://api.github.com/user/repos'
+    body = {
+        "name": repo_name,
+        "private": False,
+    }
+    response = requests.post(url, json=body, headers=headers)
+    return response.json()
+
+
+def create_ditas_repo(repo_name):
+    access_token = load_gh_access_token()
+    headers = {'Authorization': 'token ' + access_token}
+    url = 'https://api.github.com/orgs/' + GH_ORG_DITAS + '/repos'
     body = {
         "name": repo_name,
         "private": False,
