@@ -44,4 +44,4 @@ def create_private_repo(repo_name):
         "private": False,
     }
     response = requests.post(url, json=body, headers=headers)
-    return response
+    return response.json()
