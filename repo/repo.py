@@ -1,4 +1,9 @@
 import git
+import json
+import os
+import requests
+
+GH_ACCESS_FILE='github_access.json'
 
 
 # Clone repository at https_url into path folder
@@ -21,3 +26,22 @@ def clone_repo(https_url, path):
 
     # Pull repository
     origin.pull()
+
+
+def load_gh_access_token():
+    gh_access_file_path = os.path.join(os.getcwd(), GH_ACCESS_FILE)
+    with open(gh_access_file_path) as gh_access_file:
+        access_token = json.load(gh_access_file)['access_token']
+    return access_token
+
+
+def create_private_repo(repo_name):
+    access_token=load_gh_access_token()
+    headers = {'Authorization': 'token ' + access_token}
+    url = 'https://api.github.com/user/repos'
+    body = {
+        "name": repo_name,
+        "private": False,
+    }
+    response = requests.post(url, json=body, headers=headers)
+    return response
