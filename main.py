@@ -43,20 +43,7 @@ def prepare_repo_folder(url):
     return repo_path
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description='''SDK-Blueprint generator CLI.''')
-
-    parser.add_argument('VDC_URL', type=str, help='VDC repository URL')
-    parser.add_argument('DAL_URL', type=str, nargs='*', help='List of DAL repositories URLs. '
-                                                             'Assumed same URL as VDC repository if not provided')
-    parser.add_argument('-u', action='store_true', required=False, help='Update an existing blueprint with info '
-                                                                        'contained in the config files of the repos.')
-
-    parser.add_argument('-e', type=str, default='bla', help='Use this option to automatically set two URLs as example')
-
-    args = parser.parse_args()
-
+def handler_create(args):
     vdc_url = args.VDC_URL
     dal_urls = args.DAL_URL
     update = args.u
@@ -71,14 +58,6 @@ if __name__ == "__main__":
     repo.clone_repo(vdc_url, vdc_repo_path)
     extract_info_from_vdc(vdc_repo_path)
 
-    '''
-    TODO al momento tutte le info richieste stanno all'interno del vdc file, quando sapremo cosa fare anche per i dal
-    dovrà essere cambiata la definizione della classe blueprint e parte di questi metodi
-    Dal mio punto di vista non credo sia corretto fare extract info from... dalle diverse DAL, penso in realtà che sia
-    più corretto completare i campi che devono essere completati usando tutti i dal assieme nella classe blueprint, in 
-    questo modo sarà più semplice appendere i creare i campi del dizionario 
-    '''
-
     # If DAL URLs list is empty, then just extract DAL info from already cloned VDC repo
     if not dal_urls:
         extract_info_from_dal(vdc_repo_path)
@@ -88,3 +67,62 @@ if __name__ == "__main__":
             dal_repo_path = prepare_repo_folder(dal_url)
             repo.clone_repo(dal_url, dal_repo_path)
             extract_info_from_dal(dal_repo_path)
+
+    '''
+    TODO al momento tutte le info richieste stanno all'interno del vdc file, quando sapremo cosa fare anche per i dal
+    dovrà essere cambiata la definizione della classe blueprint e parte di questi metodi
+    Dal mio punto di vista non credo sia corretto fare extract info from... dalle diverse DAL, penso in realtà che sia
+    più corretto completare i campi che devono essere completati usando tutti i dal assieme nella classe blueprint, in 
+    questo modo sarà più semplice appendere i creare i campi del dizionario 
+    '''
+
+
+def handler_update(args):
+    print("Handler of update subcommand")
+
+
+def handler_repo_init(args):
+    if args.name:
+        # This will create a repo in the org DITAS-Project. DO NOT SPAM
+        #resp = repo.create_ditas_repo(args.name)
+        #print(resp['url'])
+        print(args.name)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='''DITAS SDK-Blueprint Generator.''')
+
+    parser.add_argument('-u', action='store_true', required=False, help='Update an existing blueprint with info '
+                                                                        'contained in the config files of the repos.')
+
+    subparsers = parser.add_subparsers(help='Sub-command to create or update a blueprint, or to setup a new repository')
+
+    # Create the parser for the "create" command
+    parser_create = subparsers.add_parser('create', help='Generate a new blueprint. An already existing blueprint '
+                                                         'is overwritten.')
+    parser_create.add_argument('VDC_URL', type=str, help='VDC repository URL')
+    parser_create.add_argument('DAL_URL', type=str, nargs='*', help='List of DAL repositories URLs. Assumed same URL '
+                                                                    'as VDC repository if not provided')
+    parser_create.add_argument('-e', type=str, default='bla', help='Use this option to automatically set two URLs as '
+                                                                   'example')
+    parser_create.set_defaults(func=handler_create)
+
+    # Create the parser for the "update" command
+    parser_update = subparsers.add_parser('update', help='Update an existing blueprint. Only the parts specified in the'
+                                                         'configuration files of the repositories will overwritten.')
+    parser_update.add_argument('VDC_URL', type=str, help='VDC repository URL')
+    parser_update.add_argument('DAL_URL', type=str, nargs='*', help='List of DAL repositories URLs. Assumed same URL '
+                                                                    'as VDC repository if not provided')
+    parser_update.set_defaults(func=handler_update)
+
+    # Create the parser for the "repo-init" command
+    parser_repo_init = subparsers.add_parser('repo-init', help='Create a new GitHub repository with the default '
+                                                               'structure.')
+    parser_repo_init.add_argument('name', type=str, help='Repository name')
+    parser_repo_init.set_defaults(func=handler_repo_init)
+
+    args = parser.parse_args()
+    args.func(args)
+
+    print(args)
