@@ -20,6 +20,8 @@ def generate_blueprint(vdc_path, dal_paths, update):
     blueprint = Blueprint(vdc_path, dal_paths, update)
     blueprint.add_is_tags()
     blueprint.add_is_flow()
+    blueprint.add_is_testing_output_data()
+    blueprint.add_cookbook()
     blueprint.add_exposed_api()
     blueprint.save()
 
@@ -45,7 +47,7 @@ def handler_create(args):
     # Feeling lazy, just put two URLs at random to test
     if args.e:
         vdc_url = 'git@github.com:caloc/ideko-copy.git'
-        dal_urls = ['https://github.com/DITAS-Project/SDK-Blueprint']
+        dal_urls = ['git@github.com:caloc/ideko-copy.git']
 
     # Clone VDC repo and extract info to generate Blueprint
     vdc_repo_path = prepare_repo_folder(vdc_url)
