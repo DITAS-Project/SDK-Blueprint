@@ -1,10 +1,12 @@
 import json
 import os
 import copy
+import yaml
 
 
 TEMPLATE_PATH = 'blueprint_template.json'
 VDC_CONFIG = 'bp_gen_vdc.cfg'
+DAL_CONFIG = 'bp_gen_vdc.cfg'
 
 # type of flows
 NODERED = 'node-red'
@@ -36,33 +38,32 @@ SWAGGER_PATHS = 'paths'
 
 
 class Blueprint:
-    def __init__(self, vdc_repo_path, update=False):
-        self.vdc_repo_path = vdc_repo_path
+    def __init__(self, vdc_repo_path, dal_repo_paths, update=False):
         ''' 
         loading template and blueprint:
         -   template remains constant
         -   bp will be modified during the execution        
         '''
-        with open(TEMPLATE_PATH) as template:
-            self.bp = json.load(template)
-            self.template = copy.deepcopy(self.bp)
+        self.bp = get_dict_from_file(TEMPLATE_PATH)
+        self.template = copy.deepcopy(self.bp)
 
         # loading vdc_config_file
-        with open(self.__get_vdc_path(VDC_CONFIG)) as vdc_config:
-            self.vdc_config_file = json.load(vdc_config)
+        self.vdc_config = ConfigFile(vdc_repo_path, VDC_CONFIG)
+
+        # loading dal_config_file
+        #self.dal_configs = []
+        #for path in dal_repo_paths:
+        #    self.dal_configs.append(ConfigFile(path, DAL_CONFIG))
 
         # if method update the bp file is loaded from the configuration file
         if update:
-            with open(self.__get_vdc_path(self.vdc_config_file[BLUEPRINT])) as bp_file:
-                self.bp = json.load(bp_file)
+            self.bp = get_dict_from_file(self.__get_vdc_path(self.vdc_config_file[BLUEPRINT]))
 
     def add_exposed_api(self):
-        with open(self.__get_vdc_path(self.vdc_config_file[SWAGGER])) as swagger_file:
-            self.bp[EXPOSED_API_SECTION] = json.load(swagger_file)
+        self.bp[EXPOSED_API_SECTION] = get_dict_from_file(self.vdc_config.get_path_from_section(SWAGGER))
 
     def add_is_tags(self):
-        with open(self.__get_vdc_path(self.vdc_config_file[SWAGGER])) as swagger_file:
-            swagger = json.load(swagger_file)
+        swagger = get_dict_from_file(self.vdc_config.get_path_from_section(SWAGGER))
         tags = []
         for method in swagger[SWAGGER_PATHS].keys():
             tag_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS][0])
@@ -71,25 +72,56 @@ class Blueprint:
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS] = tags
 
     def add_is_flow(self):
-        if self.vdc_config_file[FLOW][FLOW_PLATFORM].lower() == NODERED:
-            with open(self.__get_vdc_path(self.vdc_config_file[FLOW][FLOW_PATH])) as flow_source:
-                flow = {
-                    IS_FLOW_PLATFORM: self.vdc_config_file[FLOW][FLOW_PLATFORM],
-                    IS_FLOW_SOURCE: json.load(flow_source)
-                }
-                self.bp[INTERNAL_STRUCTURE_SECTION][IS_FLOW] = flow
-        elif self.vdc_config_file[FLOW][FLOW_PLATFORM].lower() == SPARK:
+        if self.vdc_config.get_nested_section(FLOW, FLOW_PLATFORM).lower() == NODERED:
             flow = {
-                IS_FLOW_PLATFORM: self.vdc_config_file[FLOW][FLOW_PLATFORM],
-                IS_FLOW_PARAMS: ''  # TODO da modificare, al momento non so cosa inserire
+                IS_FLOW_PLATFORM: self.vdc_config.get_nested_section(FLOW, FLOW_PLATFORM),
+                IS_FLOW_SOURCE: get_dict_from_file(self.vdc_config.get_path_from_nested_section(FLOW, FLOW_PATH))
             }
             self.bp[INTERNAL_STRUCTURE_SECTION][IS_FLOW] = flow
-        else:
-            print('Flow platform not recognized!')  # TODO forse qua bisogna lanciare una eccezione
+        elif self.vdc_config.get_nested_section(FLOW, FLOW_PLATFORM).lower() == SPARK:
+            flow = {
+                IS_FLOW_PLATFORM: self.vdc_config.get_nested_section(FLOW, FLOW_PLATFORM),
+                IS_FLOW_PARAMS: ''
+            }
+            self.bp[INTERNAL_STRUCTURE_SECTION][IS_FLOW] = flow
 
     def save(self):
-        with open(self.__get_vdc_path(self.vdc_config_file[BLUEPRINT]), 'w') as outfile:
+        with open(self.vdc_config.get_path_from_section(BLUEPRINT), 'w') as outfile:
             json.dump(self.bp, outfile, indent=4)
 
-    def __get_vdc_path(self, filepath):
-        return os.path.join(self.vdc_repo_path, filepath)
+
+class ConfigFile:
+    def __init__(self, repo_path, file_conf_path):
+        self.repo_path = repo_path
+        with open(self.__get_path(file_conf_path)) as config:
+            self.config_file = json.load(config)
+
+    def __get_path(self, filepath):
+        return os.path.join(self.repo_path, filepath)
+
+    def get_section(self, section):
+        return self.config_file[section]
+
+    def get_nested_section(self, upper_section, lower_section):
+        return self.config_file[upper_section][lower_section]
+
+    def get_path_from_section(self, section):
+        return self.__get_path(self.get_section(section))
+
+    def get_path_from_nested_section(self, upper_section, lower_section):
+        return self.__get_path(self.get_nested_section(upper_section, lower_section))
+
+
+JSON_EXTENSION = '.json'
+YAML_EXTENSION = '.yaml'
+
+
+def get_dict_from_file(path):
+    if JSON_EXTENSION in path.lower():
+        with open(path) as file:
+            return json.load(file)
+    elif YAML_EXTENSION in path.lower():
+        with open(path) as file:
+            return yaml.safe_load(file)
+    else:
+        print('Format file not recognized. Use .json or .yaml for ' + path)

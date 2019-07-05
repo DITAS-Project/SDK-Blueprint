@@ -14,19 +14,14 @@ repo.clone_repo(due_vdc_url, git_url)
 TMP_DIR = 'tmp'
 
 
-def extract_info_from_vdc(path):
+def generate_blueprint(vdc_path, dal_paths, update):
     # Do something
-    print("Doing some processing on VDC local repo...")
-    blueprint = Blueprint(path, update)
+    print("Creating blueprint...")
+    blueprint = Blueprint(vdc_path, dal_paths, update)
     blueprint.add_is_tags()
     blueprint.add_is_flow()
     blueprint.add_exposed_api()
     blueprint.save()
-
-
-def extract_info_from_dal(path):
-    # Do something
-    print("Doing some processing on DAL local repo...")
 
 
 def prepare_repo_folder(url):
@@ -46,7 +41,6 @@ def prepare_repo_folder(url):
 def handler_create(args):
     vdc_url = args.VDC_URL
     dal_urls = args.DAL_URL
-    update = args.u
 
     # Feeling lazy, just put two URLs at random to test
     if args.e:
@@ -56,17 +50,19 @@ def handler_create(args):
     # Clone VDC repo and extract info to generate Blueprint
     vdc_repo_path = prepare_repo_folder(vdc_url)
     repo.clone_repo(vdc_url, vdc_repo_path)
-    extract_info_from_vdc(vdc_repo_path)
 
     # If DAL URLs list is empty, then just extract DAL info from already cloned VDC repo
+    dal_repo_paths = []
     if not dal_urls:
-        extract_info_from_dal(vdc_repo_path)
+        dal_repo_paths.append(vdc_repo_path)
     else:
         # Clone each DAL repo and merge information to blueprint
         for dal_url in dal_urls:
             dal_repo_path = prepare_repo_folder(dal_url)
             repo.clone_repo(dal_url, dal_repo_path)
-            extract_info_from_dal(dal_repo_path)
+            dal_repo_paths.append(dal_repo_path)
+
+    generate_blueprint(vdc_repo_path, dal_repo_paths, False)
 
     '''
     TODO al momento tutte le info richieste stanno all'interno del vdc file, quando sapremo cosa fare anche per i dal
