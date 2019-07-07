@@ -3,6 +3,9 @@ import os
 import shutil
 from repo import repo
 from blueprint.blueprint import Blueprint
+from distutils.dir_util import copy_tree
+
+
 
 '''
 due_vdc_url = 'https://github.com/DITAS-Project/DUE-VDC'
@@ -12,7 +15,7 @@ repo.clone_repo(due_vdc_url, git_url)
 '''
 
 TMP_DIR = 'tmp'
-
+VDC_TEMPLATE = 'vdc_template'
 
 def generate_blueprint(vdc_path, dal_paths, update):
     # Do something
@@ -26,10 +29,12 @@ def generate_blueprint(vdc_path, dal_paths, update):
     blueprint.save()
 
 
-def prepare_repo_folder(url):
+def extract_repo_name(url):
     # Extract the name of the repository from URL
-    repo_name = os.path.basename(os.path.normpath(url))
+    return os.path.basename(os.path.normpath(url))
 
+
+def prepare_repo_folder(repo_name):
     # Create a subfolder in TMP_DIR with the name of the repo
     repo_path = os.path.join(os.getcwd(), TMP_DIR, repo_name)
 
@@ -50,7 +55,8 @@ def handler_create(args):
         dal_urls = ['git@github.com:caloc/ideko-copy.git']
 
     # Clone VDC repo and extract info to generate Blueprint
-    vdc_repo_path = prepare_repo_folder(vdc_url)
+    repo_name = extract_repo_name(vdc_url)
+    vdc_repo_path = prepare_repo_folder(repo_name)
     repo.clone_repo(vdc_url, vdc_repo_path)
 
     # If DAL URLs list is empty, then just extract DAL info from already cloned VDC repo
@@ -81,10 +87,26 @@ def handler_update(args):
 
 def handler_repo_init(args):
     if args.name:
+        repo_name = args.name
+
         # This will create a repo in the org DITAS-Project. DO NOT SPAM
-        #resp = repo.create_ditas_repo(args.name)
-        #print(resp['url'])
-        print(args.name)
+        #resp = repo.create_ditas_repo(repo_name)
+        # TODO: delete next line when testing is complete
+        resp = repo.create_personal_repo(repo_name)
+        print(resp['html_url'])
+        repo_url = resp['html_url']
+
+
+        # Setup a local folder to track the remote repository
+        repo_path = prepare_repo_folder(repo_name)
+        remote_repo = repo.clone_repo(https_url=repo_url, path=repo_path, new_repo=True)
+
+        # Use the default VDC template for the new repository
+        from_directory = os.path.join(os.getcwd(), VDC_TEMPLATE)
+        copy_tree(from_directory, repo_path)
+
+        # Commit and push the new structure
+        repo.commit_and_push_all_changes(remote_repo)
 
 
 if __name__ == "__main__":
