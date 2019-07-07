@@ -2,6 +2,7 @@ import json
 import os
 import copy
 import yaml
+import re
 from blueprint.configfile import ConfigFile
 
 
@@ -22,6 +23,7 @@ INTERNAL_STRUCTURE_SECTION = 'INTERNAL_STRUCTURE'
 IS_OVERVIEW = 'Overview'
 IS_OW_TAGS = 'tags'
 IS_OW_TAGS_METHODID = 'method_id'
+IS_DATA_SOURCES = "Data_Sources"
 IS_FLOW = 'Flow'
 IS_FLOW_PLATFORM = 'platform'
 IS_FLOW_PARAMS = 'parameters'
@@ -42,6 +44,7 @@ FLOW_PATH = 'source'
 COOKBOOK = 'cookbook'
 ZIP_DIR = 'zip_directory'
 API = 'api'
+MAIN_PROTO = 'main_proto'
 
 # const referred to the api file
 API_PATHS = 'paths'
@@ -121,6 +124,37 @@ class Blueprint:
                 outdata_template[IS_TOD_ZIP] = 'File not found'
             outdata.append(outdata_template)
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA] = outdata
+
+    def parse_proto_imports(self):
+        for dal_config in self.dal_configs:
+            imports = []
+            # Parse the main proto file looking for all the imports statement
+            with open(dal_config.get_path_from_section(MAIN_PROTO), 'r') as main_proto:
+                main_proto_folder = os.path.abspath(os.path.join(dal_config.get_section(MAIN_PROTO), os.pardir))
+                file_lines = main_proto.readlines()
+                for line in file_lines:
+                    matches = re.match(r'import "(.*)";', line)
+                    if matches:
+                        # line is an import statement
+                        imported_file = matches.group(1)
+                        if imported_file not in imports:
+                            imports.append(os.path.join(main_proto_folder, imported_file))
+                # TODO: do something with the whole the content of the file (file_lines)
+
+            # For each imported file, recursively look for imports statement
+            for proto in imports:
+                with open(proto, 'r') as proto_file:
+                    file_lines = proto_file.readlines()
+                    for line in file_lines:
+                        matches = re.match(r'import "(.*)";', line)
+                        if matches:
+                            # line is an import statement
+                            imported_file = matches.group(1)
+                            if imported_file not in imports:
+                                imports.append(os.path.join(main_proto_folder, imported_file))
+                    # TODO: do something with the whole the content of the file (file_lines)
+
+
 
     def save(self):
         with open(self.vdc_config.get_path_from_section(BLUEPRINT), 'w') as outfile:
