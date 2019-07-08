@@ -116,39 +116,54 @@ class Blueprint:
             outdata.append(outdata_template)
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA] = outdata
 
-    def parse_proto_imports(self):
+    def add_is_data_sources(self):
+        # Copy the content of proto files
+        data_sources = {}
         for dal_config in self.dal_configs:
             imports = []
             # Parse the main proto file looking for all the imports statement
+            file_content = ""
             with open(dal_config.get_path_from_main_proto(), 'r') as main_proto:
-                main_proto_folder = os.path.abspath(os.path.join(dal_config.get_main_proto(), os.pardir))
+                main_proto_folder = os.path.abspath(os.path.join(dal_config.get_path_from_main_proto(), os.pardir))
+                print("main_proto_folder: " + main_proto_folder)
                 file_lines = main_proto.readlines()
                 for line in file_lines:
+                    file_content += line
                     matches = re.match(r'import "(.*)";', line)
                     if matches:
                         # line is an import statement
                         imported_file = matches.group(1)
                         if imported_file not in imports:
-                            imports.append(os.path.join(main_proto_folder, imported_file))
-                # TODO: do something with the whole the content of the file (file_lines)
+                            print("Adding " + imported_file)
+                            imports.append(imported_file)
+            # TODO: do something with the whole the content of the file (file_content)
+            main_proto_file_name = os.path.basename(dal_config.get_main_proto())
+            data_sources[main_proto_file_name] = file_content
+
 
             # For each imported file, recursively look for imports statement
             for proto in imports:
-                with open(proto, 'r') as proto_file:
+                file_content = ""
+                subproto_file = os.path.join(main_proto_folder, proto)
+                print("Opening sub-proto file: " + subproto_file)
+                with open(subproto_file, 'r') as proto_file:
                     file_lines = proto_file.readlines()
                     for line in file_lines:
+                        file_content += line
                         matches = re.match(r'import "(.*)";', line)
                         if matches:
                             # line is an import statement
                             imported_file = matches.group(1)
                             if imported_file not in imports:
                                 imports.append(os.path.join(main_proto_folder, imported_file))
-                    # TODO: do something with the whole the content of the file (file_lines)
-
-
+                # TODO: do something with the whole the content of the file (file_content)
+                data_sources[proto] = file_content
+        self.bp[INTERNAL_STRUCTURE_SECTION][IS_DATA_SOURCES] = data_sources
 
     def save(self):
-        with open(self.vdc_config.get_blueprint_path(), 'w') as outfile:
+        file_path = self.vdc_config.get_blueprint_path()
+        print("Saving blueprint at " + file_path)
+        with open(file_path, 'w') as outfile:
             json.dump(self.bp, outfile, indent=4)
 
 # supported extension for dictionaries
