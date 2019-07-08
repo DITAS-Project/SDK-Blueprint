@@ -17,6 +17,7 @@ repo.clone_repo(due_vdc_url, git_url)
 TMP_DIR = 'tmp'
 VDC_TEMPLATE = 'vdc_template'
 
+
 def generate_blueprint(vdc_path, dal_paths, update):
     # Do something
     print("Creating blueprint...")

@@ -3,7 +3,8 @@ import os
 import copy
 import yaml
 import re
-from blueprint.configfile import ConfigFile
+from blueprint.config_file.vdc_configfile import VDCConfigFile
+from blueprint.config_file.dal_configfile import DALConfigFile
 
 
 TEMPLATE_PATH = 'blueprint_template.json'
@@ -36,16 +37,6 @@ ABSTRACT_PROPERTIES_SECTION = 'ABSTRACT_PROPERTIES'
 COOKBOOK_APPENDIX_SECTION = 'COOKBOOK_APPENDIX'
 EXPOSED_API_SECTION = 'EXPOSED_API'
 
-# const referred to config files
-BLUEPRINT = 'blueprint'
-FLOW = 'flow'
-FLOW_PLATFORM = 'platform'
-FLOW_PATH = 'source'
-COOKBOOK = 'cookbook'
-ZIP_DIR = 'zip_directory'
-API = 'api'
-MAIN_PROTO = 'main_proto'
-
 # const referred to the api file
 API_PATHS = 'paths'
 
@@ -61,22 +52,22 @@ class Blueprint:
         self.template = copy.deepcopy(self.bp)
 
         # loading vdc_config_file
-        self.vdc_config = ConfigFile(vdc_repo_path, VDC_CONFIG)
+        self.vdc_config = VDCConfigFile(vdc_repo_path, VDC_CONFIG)
 
         # loading dal_config_file
         self.dal_configs = []
         for path in dal_repo_paths:
-            self.dal_configs.append(ConfigFile(path, DAL_CONFIG))
+            self.dal_configs.append(DALConfigFile(path, DAL_CONFIG))
 
         # if method update the bp file is loaded from the configuration file
         if update:
-            self.bp = get_dict_from_file(self.__get_vdc_path(self.vdc_config_file[BLUEPRINT]))
+            self.bp = get_dict_from_file(self.vdc_config.get_blueprint_path())
 
     def add_exposed_api(self):
-        self.bp[EXPOSED_API_SECTION] = get_dict_from_file(self.vdc_config.get_path_from_section(API))
+        self.bp[EXPOSED_API_SECTION] = get_dict_from_file(self.vdc_config.get_api_path())
 
     def add_is_tags(self):
-        api = get_dict_from_file(self.vdc_config.get_path_from_section(API))
+        api = get_dict_from_file(self.vdc_config.get_api_path())
         tags = []
         for method in api[API_PATHS].keys():
             tag_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS][0])
@@ -85,15 +76,15 @@ class Blueprint:
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS] = tags
 
     def add_is_flow(self):
-        if self.vdc_config.get_nested_section(FLOW, FLOW_PLATFORM).lower() == NODERED:
+        if self.vdc_config.get_flow_platform().lower() == NODERED:
             flow = {
-                IS_FLOW_PLATFORM: self.vdc_config.get_nested_section(FLOW, FLOW_PLATFORM),
-                IS_FLOW_SOURCE: get_dict_from_file(self.vdc_config.get_path_from_nested_section(FLOW, FLOW_PATH))
+                IS_FLOW_PLATFORM: self.vdc_config.get_flow_platform(),
+                IS_FLOW_SOURCE: get_dict_from_file(self.vdc_config.get_flow_source_path())
             }
             self.bp[INTERNAL_STRUCTURE_SECTION][IS_FLOW] = flow
-        elif self.vdc_config.get_nested_section(FLOW, FLOW_PLATFORM).lower() == SPARK:
+        elif self.vdc_config.get_flow_platform().lower() == SPARK:
             flow = {
-                IS_FLOW_PLATFORM: self.vdc_config.get_nested_section(FLOW, FLOW_PLATFORM),
+                IS_FLOW_PLATFORM: self.vdc_config.get_flow_platform(),
                 IS_FLOW_PARAMS: ''
             }
             self.bp[INTERNAL_STRUCTURE_SECTION][IS_FLOW] = flow
@@ -103,23 +94,23 @@ class Blueprint:
             VDC_SECTION: {},
             DAL_SECTION: {}
         }
-        with open(self.vdc_config.get_path_from_section(COOKBOOK), 'r') as vdc_cookbook:
+        with open(self.vdc_config.get_cookbook_path(), 'r') as vdc_cookbook:
             cookbook[VDC_SECTION][self.vdc_config.repo_name] = vdc_cookbook.read()
         for dal_config in self.dal_configs:
-            with open(dal_config.get_path_from_section(COOKBOOK), 'r') as dal_cookbook:
+            with open(dal_config.get_cookbook_path(), 'r') as dal_cookbook:
                 cookbook[DAL_SECTION][dal_config.repo_name] = dal_cookbook.read()
         self.bp[COOKBOOK_APPENDIX_SECTION] = cookbook
 
     def add_is_testing_output_data(self):
-        api = get_dict_from_file(self.vdc_config.get_path_from_section(API))
+        api = get_dict_from_file(self.vdc_config.get_api_path())
         outdata = []
         for method in api[API_PATHS].keys():
             outdata_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA][0])
             method = method.replace('/', '')
             outdata_template[IS_TOD_METHODID] = method
-            zip_file = os.path.join(self.vdc_config.get_path_from_section(ZIP_DIR), method + ZIP_FORMAT)
+            zip_file = os.path.join(self.vdc_config.get_zip_path(), method + ZIP_FORMAT)
             if os.path.exists(zip_file):
-                outdata_template[IS_TOD_ZIP] = os.path.join(self.vdc_config.get_section(ZIP_DIR), method + ZIP_FORMAT)
+                outdata_template[IS_TOD_ZIP] = os.path.join(self.vdc_config.get_zip(), method + ZIP_FORMAT)
             else:
                 outdata_template[IS_TOD_ZIP] = 'File not found'
             outdata.append(outdata_template)
@@ -129,8 +120,8 @@ class Blueprint:
         for dal_config in self.dal_configs:
             imports = []
             # Parse the main proto file looking for all the imports statement
-            with open(dal_config.get_path_from_section(MAIN_PROTO), 'r') as main_proto:
-                main_proto_folder = os.path.abspath(os.path.join(dal_config.get_section(MAIN_PROTO), os.pardir))
+            with open(dal_config.get_path_from_main_proto(), 'r') as main_proto:
+                main_proto_folder = os.path.abspath(os.path.join(dal_config.get_main_proto(), os.pardir))
                 file_lines = main_proto.readlines()
                 for line in file_lines:
                     matches = re.match(r'import "(.*)";', line)
@@ -157,10 +148,10 @@ class Blueprint:
 
 
     def save(self):
-        with open(self.vdc_config.get_path_from_section(BLUEPRINT), 'w') as outfile:
+        with open(self.vdc_config.get_blueprint_path(), 'w') as outfile:
             json.dump(self.bp, outfile, indent=4)
 
-
+# supported extension for dictionaries
 JSON_EXTENSION = '.json'
 YAML_EXTENSION = '.yaml'
 
