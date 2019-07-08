@@ -26,6 +26,7 @@ def generate_blueprint(vdc_path, dal_paths, update):
     blueprint.add_is_testing_output_data()
     blueprint.add_cookbook()
     blueprint.add_exposed_api()
+    blueprint.add_is_data_sources()
     blueprint.save()
 
 
@@ -50,9 +51,9 @@ def handler_create(args):
     dal_urls = args.DAL_URL
 
     # Feeling lazy, just put two URLs at random to test
-    if args.e:
-        vdc_url = 'git@github.com:caloc/ideko-copy.git'
-        dal_urls = ['git@github.com:caloc/ideko-copy.git']
+    #if args.e:
+    #    vdc_url = 'git@github.com:caloc/ideko-copy.git'
+    #    dal_urls = ['git@github.com:caloc/ideko-copy.git']
 
     # Clone VDC repo and extract info to generate Blueprint
     repo_name = extract_repo_name(vdc_url)
@@ -65,6 +66,8 @@ def handler_create(args):
         dal_repo_paths.append(vdc_repo_path)
     else:
         # Clone each DAL repo and merge information to blueprint
+        # TODO: if the DAL URL is the same as VDC, prepare_repo_folder could cause some troubles
+        # TODO: create a subversion of the repo folder
         for dal_url in dal_urls:
             dal_repo_path = prepare_repo_folder(dal_url)
             repo.clone_repo(dal_url, dal_repo_path)
@@ -91,7 +94,7 @@ def handler_repo_init(args):
 
         # This will create a repo in the org DITAS-Project. DO NOT SPAM
         #resp = repo.create_ditas_repo(repo_name)
-        # TODO: delete next line when testing is complete
+        # TODO: delete next line when testing is complete and uncomment the previous one
         resp = repo.create_personal_repo(repo_name)
         print(resp['html_url'])
         repo_url = resp['html_url']
@@ -124,8 +127,8 @@ if __name__ == "__main__":
     parser_create.add_argument('VDC_URL', type=str, help='VDC repository URL')
     parser_create.add_argument('DAL_URL', type=str, nargs='*', help='List of DAL repositories URLs. Assumed same URL '
                                                                     'as VDC repository if not provided')
-    parser_create.add_argument('-e', type=str, default='bla', help='Use this option to automatically set two URLs as '
-                                                                   'example')
+    #parser_create.add_argument('-e', type=str, default='bla', help='Use this option to automatically set two URLs as '
+    #                                                               'example')
     parser_create.set_defaults(func=handler_create)
 
     # Create the parser for the "update" command
@@ -145,4 +148,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.func(args)
 
-    print(args)
+    #print(args)
