@@ -47,15 +47,7 @@ def prepare_repo_folder(repo_name):
     return repo_path
 
 
-def handler_create(args):
-    vdc_url = args.VDC_URL
-    dal_urls = args.DAL_URL
-
-    # Feeling lazy, just put two URLs at random to test
-    #if args.e:
-    #    vdc_url = 'git@github.com:caloc/ideko-copy.git'
-    #    dal_urls = ['git@github.com:caloc/ideko-copy.git']
-
+def clone_repos(vdc_url, dal_urls):
     # Clone VDC repo and extract info to generate Blueprint
     repo_name = extract_repo_name(vdc_url)
     vdc_repo_path = prepare_repo_folder(repo_name)
@@ -74,19 +66,19 @@ def handler_create(args):
             repo.clone_repo(dal_url, dal_repo_path)
             dal_repo_paths.append(dal_repo_path)
 
-    generate_blueprint(vdc_repo_path, dal_repo_paths, False)
+    return vdc_repo_path, dal_repo_paths
 
-    '''
-    TODO al momento tutte le info richieste stanno all'interno del vdc file, quando sapremo cosa fare anche per i dal
-    dovrà essere cambiata la definizione della classe blueprint e parte di questi metodi
-    Dal mio punto di vista non credo sia corretto fare extract info from... dalle diverse DAL, penso in realtà che sia
-    più corretto completare i campi che devono essere completati usando tutti i dal assieme nella classe blueprint, in 
-    questo modo sarà più semplice appendere i creare i campi del dizionario 
-    '''
+
+def handler_create(args):
+    vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, args.DAL_URL)
+
+    generate_blueprint(vdc_repo_path, dal_repo_paths, False)
 
 
 def handler_update(args):
-    print("Handler of update subcommand")
+    vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, args.DAL_URL)
+
+    generate_blueprint(vdc_repo_path, dal_repo_paths, True)
 
 
 def handler_repo_init(args):
@@ -116,9 +108,6 @@ def handler_repo_init(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='''DITAS SDK-Blueprint Generator.''')
-
-    parser.add_argument('-u', action='store_true', required=False, help='Update an existing blueprint with info '
-                                                                        'contained in the config files of the repos.')
 
     subparsers = parser.add_subparsers(help='Sub-command to create or update a blueprint, or to setup a new repository')
 
