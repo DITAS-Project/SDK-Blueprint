@@ -140,7 +140,6 @@ class Blueprint:
             main_proto_file_name = os.path.basename(dal_config.get_main_proto())
             data_sources[main_proto_file_name] = file_content
 
-
             # For each imported file, recursively look for imports statement
             for proto in imports:
                 file_content = ""
@@ -155,7 +154,7 @@ class Blueprint:
                             # line is an import statement
                             imported_file = matches.group(1)
                             if imported_file not in imports:
-                                imports.append(os.path.join(main_proto_folder, imported_file))
+                                imports.append(imported_file)
                 # TODO: do something with the whole the content of the file (file_content)
                 data_sources[proto] = file_content
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_DATA_SOURCES] = data_sources
