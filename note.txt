@@ -43,3 +43,18 @@ Nel blueprint_template.json
 	
 
 - EXPOSED_API: copiare swagger file
+
+---------------------------
+
+Incontro del 02/07:
+- Mettere in modulo a parte le chiamate alla REST API di github
+- Register publish, prende un blueprint da un VDC e lo pubblica su un
+  registro
+  
+---------------------------
+
+DEMO:
+python main.py repo-init VDC newvdc
+python main.py repo-init DAL newdal
+python main.py create https://github.com/caloc/ideko-copy
+python main.py update https://github.com/caloc/ideko-copy
