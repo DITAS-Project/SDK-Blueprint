@@ -61,6 +61,7 @@ class Blueprint:
 
         # if method update the bp file is loaded from the configuration file
         if update:
+            print("Trying to open existing blueprint at " + self.vdc_config.get_blueprint_path())
             self.bp = get_dict_from_file(self.vdc_config.get_blueprint_path())
 
     def add_exposed_api(self):

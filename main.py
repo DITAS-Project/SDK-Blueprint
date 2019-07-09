@@ -16,6 +16,7 @@ repo.clone_repo(due_vdc_url, git_url)
 
 TMP_DIR = 'tmp'
 VDC_TEMPLATE = 'vdc_template'
+DAL_TEMPLATE = 'dal_template'
 
 
 def generate_blueprint(vdc_path, dal_paths, update):
@@ -98,7 +99,10 @@ def handler_repo_init(args):
         remote_repo = repo.clone_repo(https_url=repo_url, path=repo_path, new_repo=True)
 
         # Use the default VDC template for the new repository
-        from_directory = os.path.join(os.getcwd(), VDC_TEMPLATE)
+        if args.type == 'VDC':
+            from_directory = os.path.join(os.getcwd(), VDC_TEMPLATE)
+        elif args.type == 'DAL':
+            from_directory = os.path.join(os.getcwd(), DAL_TEMPLATE)
         copy_tree(from_directory, repo_path)
 
         # Commit and push the new structure
@@ -132,6 +136,7 @@ if __name__ == "__main__":
     # Create the parser for the "repo-init" command
     parser_repo_init = subparsers.add_parser('repo-init', help='Create a new GitHub repository with the default '
                                                                'structure.')
+    parser_repo_init.add_argument('type', choices=['VDC', 'DAL'], help="Type of repository to create")
     parser_repo_init.add_argument('name', type=str, help='Repository name')
     parser_repo_init.set_defaults(func=handler_repo_init)
 
