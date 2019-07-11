@@ -56,5 +56,5 @@ Incontro del 02/07:
 DEMO:
 python main.py repo-init VDC newvdc
 python main.py repo-init DAL newdal
-python main.py create https://github.com/caloc/ideko-copy
-python main.py update https://github.com/caloc/ideko-copy
+python main.py create git@github.com:caloc/ideko-copy.git
+python main.py update git@github.com:caloc/ideko-copy.git
