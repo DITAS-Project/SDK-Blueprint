@@ -40,7 +40,11 @@
 	"DATA_MANAGEMENT": [
 		{
 			"method_id": "",
-			"attributes": {}
+			"attributes": {
+				"dataUtility": []
+				"security": [],
+				"privacy": []
+			}
 		}
 	],	
 	"ABSTRACT_PROPERTIES": {
