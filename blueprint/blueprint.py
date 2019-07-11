@@ -113,7 +113,7 @@ class Blueprint:
             if os.path.exists(zip_file):
                 outdata_template[IS_TOD_ZIP] = os.path.join(self.vdc_config.get_zip(), method + ZIP_FORMAT)
             else:
-                outdata_template[IS_TOD_ZIP] = 'File not found'
+                outdata_template[IS_TOD_ZIP] = ''
             outdata.append(outdata_template)
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA] = outdata
 

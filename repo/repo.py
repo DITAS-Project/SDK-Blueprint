@@ -31,9 +31,9 @@ def clone_repo(https_url, path, new_repo=False):
     return empty_repo
 
 
-def commit_and_push_all_changes(repo):
+def commit_and_push_all_changes(repo, commit_msg):
     repo.git.add(A=True)
-    repo.index.commit('VDC template commit')
+    repo.index.commit(commit_msg)
     repo.git.execute(["git", "push", "-u", "origin", "master"])
 
 def load_gh_access_token():

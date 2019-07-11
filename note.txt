@@ -58,3 +58,29 @@ python main.py repo-init VDC newvdc
 python main.py repo-init DAL newdal
 python main.py create git@github.com:caloc/ideko-copy.git
 python main.py update git@github.com:caloc/ideko-copy.git
+
+----------------------------
+
+Incontro 10/07
+
+X aggiungere anche lo scheletro blueprint vuoto in vdc_template
+X nel comando create, di default non viene fatto il push del bp generato,
+  se invece viene specificato l'opzione push sì
+X nel dal_template inserire una cartella 'proto'
+X IS - Testing_Output_Data: se il file zip non esiste, mettiamo stringa
+  vuota a 'zip_data'
+- aggiungere print per lo stato della generazione del blueprint
+- rendere la generazione del blueprint libera da crash dovuti a campi
+  all'interno dei file di configurazione lasciati vuoti
+
+- cookbook_appendix: bisogna unire file provienienti da vdc e dal, in 
+  qualche modo. In attesa di indicazioni da Giovanni
+
+
+- in fase di repo-init creare la cartella data-management
+- in fase di create, creare un file con la lista delle metriche che
+  andrà a popolare la sezione data_management sotto data utility. Di
+  default vengono messe tutte le metriche possibili, poi verranno can-
+  cellate manualmente quelle non interessanti/non calcolabili.
+- per ogni metodo, un file metodo.json contenente tutte le metriche nella
+  stessa cartella dei zip
