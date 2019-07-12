@@ -29,4 +29,4 @@ class VDCConfigFile(ConfigFile):
         return self.config_file[FLOW][FLOW_PLATFORM]
 
     def get_flow_source_path(self):
-        return super().get_path(self.config_file[FLOW][FLOW_PATH])
+        return super().get_path(self.config_file[FLOW][FLOW_PATH], FLOW + '//' + FLOW_PATH)
