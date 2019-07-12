@@ -69,12 +69,13 @@ X nel comando create, di default non viene fatto il push del bp generato,
 X nel dal_template inserire una cartella 'proto'
 X IS - Testing_Output_Data: se il file zip non esiste, mettiamo stringa
   vuota a 'zip_data'
-X aggiungere print per lo stato della generazione del blueprint
-- rendere la generazione del blueprint libera da crash dovuti a campi
+X rendere la generazione del blueprint libera da crash dovuti a campi
   all'interno dei file di configurazione lasciati vuoti
 
 - cookbook_appendix: bisogna unire file provienienti da vdc e dal, in 
   qualche modo. In attesa di indicazioni da Giovanni
+- aggiungere print per lo stato della generazione del blueprint, sezione
+  cookbook
 
 
 X in fase di repo-init creare la cartella data-management
