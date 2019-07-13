@@ -133,20 +133,20 @@ if __name__ == "__main__":
     parser_create.add_argument('VDC_URL', type=str, help='VDC repository URL')
     parser_create.add_argument('DAL_URL', type=str, nargs='*', help='List of DAL repositories URLs. Assumed same URL '
                                                                     'as VDC repository if not provided')
-    parser_create.add_argument('-p', dest='push', action='store_true', required=False, help='Push new generated blueprint into'
-                                                                                  'VDC repository')
+    parser_create.add_argument('-p', dest='push', action='store_true', required=False, help='Push new generated blueprint'
+                                                                                            ' into VDC repository')
     #parser_create.add_argument('-e', type=str, default='bla', help='Use this option to automatically set two URLs as '
     #                                                               'example')
     parser_create.set_defaults(func=handler_create)
 
     # Create the parser for the "update" command
-    parser_update = subparsers.add_parser('update', help='Update an existing blueprint. Only the parts specified in the'
-                                                         'configuration files of the repositories will overwritten.')
+    parser_update = subparsers.add_parser('update', help='Update an existing blueprint. Only the parts specified in the '
+                                                         'configuration files of the repositories will be overwritten.')
     parser_update.add_argument('VDC_URL', type=str, help='VDC repository URL')
     parser_update.add_argument('DAL_URL', type=str, nargs='*', help='List of DAL repositories URLs. Assumed same URL '
                                                                     'as VDC repository if not provided')
-    parser_update.add_argument('-p', dest='push', action='store_true', required=False, help='Push new generated blueprint into'
-                                                                                  'VDC repository')
+    parser_update.add_argument('-p', dest='push', action='store_true', required=False,
+                               help='Push new generated blueprint into VDC repository')
     parser_update.set_defaults(func=handler_update)
 
     # Create the parser for the "repo-init" command
