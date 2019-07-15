@@ -18,16 +18,16 @@ Incontro del 10/07
 
 - ~~in fase di repo-init creare la cartella data-management~~
 - ~~aggiustata l'indentazione, file in vdc_template/DATA_MANAGEMENT.json~~
-  - dataUtility, privacy, security sono degli array di elementi struttu-
-    rati come DATA_MGMT_dataUtility_security_privacy_elem.json
-  - a sua volta ognuno di questi elementi avrà all'interno di properties
+  - ~~dataUtility, privacy, security sono degli array di elementi struttu-
+    rati come DATA_MGMT_dataUtility_security_privacy_elem.json~~
+  - ~~a sua volta ognuno di questi elementi avrà all'interno di properties
     un ulteriore oggetto JSON il CUI NOME E' QUELLO DELLA METRICA, quindi
     non si può definire a priori ma c'è un ulteriore file della sua
-    struttura DATA_MGMT_dataUtility_security_privacy_elem_prop.json
+    struttura DATA_MGMT_dataUtility_security_privacy_elem_prop.json~~
 
 ~~in fase di create, creare un file con la lista delle metriche che
   andrà a popolare la sezione data_management sotto data utility.~~
-  - Di default vengono messe tutte le metriche possibili, poi verranno can-
-    cellate manualmente quelle non interessanti/non calcolabili.
-- per ogni metodo, un file metodo.json contenente tutte le metriche nella
-  stessa cartella dei zip
+  - ~~Di default vengono messe tutte le metriche possibili, poi verranno can-
+    cellate manualmente quelle non interessanti/non calcolabili.~~
+- ~~per ogni metodo, si suppone che esista un file metodo.json contenente tutte le metriche nella
+  stessa cartella dei zip (d'ora in avanti data-management conterrà entrambe le informazioni)~~
