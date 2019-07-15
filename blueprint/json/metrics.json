@@ -1,0 +1,26 @@
+{
+	"metrics": [
+		{
+			"name": "availability",
+			"unit": "percentage",
+			"maximum": "",
+			"minimum": ""
+		},
+		{
+			"name": "response_time",
+			"unit": "seconds",
+			"maximum": "",
+			"minimum": ""
+		},
+		{
+			"name": "throughput",
+			"unit": "bytesPerSecond",
+			"maximum": "",
+			"minimum": ""
+		}
+	
+	
+	]
+	
+	
+}

@@ -8,6 +8,12 @@ from blueprint.config_file.dal_configfile import DALConfigFile
 from blueprint.config_file.configfile import MissingReferenceException
 
 
+BLUEPRINT_FOLDER = 'blueprint'
+JSON_TEMPLATES_FOLDER = 'json'
+DM_EL_ATT_DU_PR_SE_STRUCTURE = 'DATA_MGMT_dataUtility_security_privacy_elem.json'
+DM_EL_ATT_DU_PR_SE_PROPERTIES_STRUCTURE = 'DATA_MGMT_dataUtility_security_privacy_elem_prop.json'
+DM_METRICS = 'metrics.json'
+
 TEMPLATE_PATH = 'blueprint_template.json'
 VDC_SECTION = 'VDC'
 DAL_SECTION = 'DAL'
@@ -34,6 +40,19 @@ IS_TESTING_OUTPUT_DATA = 'Testing_Output_Data'
 IS_TOD_METHODID = 'method_id'
 IS_TOD_ZIP = 'zip_data'
 DATA_MANAGEMENT_SECTION = 'DATA_MANAGEMENT'
+DM_EL_METHOD_ID = 'method_id'
+DM_EL_ATTRIBUTES = 'attributes'
+DM_EL_ATT_DATA_UTILITY = 'dataUtility'
+DM_EL_ATT_PRIVACY = 'privacy'
+DM_EL_ATT_SECURITY = 'security'
+DM_EL_ATT_DU_PR_SE_ID = 'id'
+DM_EL_ATT_DU_PR_SE_NAME = 'name'
+DM_EL_ATT_DU_PR_SE_TYPE = 'type'
+DM_EL_ATT_DU_PR_SE_PROPERTIES = 'properties'
+DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT = 'unit'
+DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX = 'maximum'
+DM_EL_ATT_DU_PR_SE_PROPERTIES_MIN = 'minimum'
+DM_EL_ATT_DU_PR_SE_PROPERTIES_VALUE = 'value'
 ABSTRACT_PROPERTIES_SECTION = 'ABSTRACT_PROPERTIES'
 COOKBOOK_APPENDIX_SECTION = 'COOKBOOK_APPENDIX'
 EXPOSED_API_SECTION = 'EXPOSED_API'
@@ -41,6 +60,12 @@ EXPOSED_API_SECTION = 'EXPOSED_API'
 # const referred to the api file
 API_PATHS = 'paths'
 
+# const referred to the metrics file
+METRICS_ROOT = 'metrics'
+METRIC_NAME = 'name'
+METRIC_UNIT = 'unit'
+METRIC_MAXIMUM = 'maximum'
+METRIC_MINIMUM = 'minimum'
 
 class Blueprint:
     def __init__(self, vdc_repo_path, dal_repo_paths, update=False):
@@ -138,8 +163,8 @@ class Blueprint:
         try:
             api = get_dict_from_file(self.vdc_config.get_api_path())
             outdata = []
-            zip_path = self.vdc_config.get_zip_path()
-            print('Zip file at ' + zip_path)
+            zip_path = self.vdc_config.get_data_management_path()
+            print('Zip files at ' + zip_path)
             for method in api[API_PATHS].keys():
                 outdata_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA][0])
                 method = method.replace('/', '')
@@ -148,7 +173,7 @@ class Blueprint:
                 print('Searching for ' + zip_file)
                 if os.path.exists(zip_file):
                     print('Zip file found!')
-                    outdata_template[IS_TOD_ZIP] = os.path.join(self.vdc_config.get_zip(), method + ZIP_FORMAT)
+                    outdata_template[IS_TOD_ZIP] = os.path.join(self.vdc_config.get_data_management(), method + ZIP_FORMAT)
                 else:
                     print('Zip file not found!')
                     outdata_template[IS_TOD_ZIP] = ''
@@ -202,6 +227,52 @@ class Blueprint:
             except MissingReferenceException as e:
                 e.print(dal_config.repo_name)
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_DATA_SOURCES] = data_sources
+
+    def add_data_management(self):
+        try:
+            api_path = self.vdc_config.get_api_path()
+            print('Gathering methods info from API file')
+            api = get_dict_from_file(api_path)
+            metrics_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
+            print('Gathering standard metrics from: ' + metrics_path)
+            dm_du_pr_se_elem = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER,
+                                                                               DM_EL_ATT_DU_PR_SE_STRUCTURE)))
+            dm_du_pr_se_elem_prop = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER,
+                                                                                    JSON_TEMPLATES_FOLDER,
+                                                                                    DM_EL_ATT_DU_PR_SE_PROPERTIES_STRUCTURE)))
+
+            data_mgmt_list = []
+            for method_raw in api[API_PATHS].keys():
+                method =  method_raw.replace('/', '')
+                dm_elem = copy.deepcopy(self.template[DATA_MANAGEMENT_SECTION][0])
+                dm_elem[DM_EL_METHOD_ID] = method
+                # Fill ATTRIBUTES section of each method element
+                data_mgmt_path = self.vdc_config.get_data_management_path()
+                method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, method + "_metrics.json"))
+                metrics = get_dict_from_file(method_metrics_path)
+                print("Gathering metrics of method " + method + " from " + method_metrics_path)
+                for metric in metrics[METRICS_ROOT]:
+                    # Extract template as a copy of the structure taken from file
+                    dm_metric_elem = copy.deepcopy(dm_du_pr_se_elem)
+                    dm_metric_elem_prop = copy.deepcopy(dm_du_pr_se_elem_prop)
+                    # Fill the structure
+                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_ID] = metric[METRIC_NAME]
+                    # TODO: name and type missing
+                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT] = metric[METRIC_UNIT]
+                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX] = metric[METRIC_MAXIMUM]
+                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MIN] = metric[METRIC_MINIMUM]
+                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_VALUE] = metric[METRIC_UNIT]
+
+                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_PROPERTIES] = {metric[METRIC_NAME]: dm_metric_elem_prop}
+                    dm_elem[DM_EL_ATTRIBUTES][DM_EL_ATT_DATA_UTILITY].append(dm_metric_elem)
+
+                data_mgmt_list.append(dm_elem)
+
+            self.bp[DATA_MANAGEMENT_SECTION] = data_mgmt_list
+        except TypeError:
+            print('API file corrupted!\nCannot extract methods info from API file')
+        except MissingReferenceException as e:
+            e.print(VDC_CONFIG)
 
     def save(self):
         file_path = self.vdc_config.get_blueprint_path()
