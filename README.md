@@ -55,4 +55,4 @@ This command will create a new VDC repository into the DITAS-Project GitHub orga
 
 ##### TODO
 
-Refer to [TODO file](https://github.com/DITAS-Project/SDK-Blueprint/blob/master/TODO)
+Refer to [TODO file](https://github.com/DITAS-Project/SDK-Blueprint/blob/master/TODO.md)
