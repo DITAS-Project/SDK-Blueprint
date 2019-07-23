@@ -1,0 +1,8 @@
+
+SDK-BluePrint
+- Definire uno step intermedio tra repo-init e bp create in cui 
+  per ogni metodo dell'API viene creato un file con tutte le metriche 
+  possibili.
+  L'utente potrebbe modificare manualmente queste liste per metodo, 
+  invece la parte bp create prenderà solo le metriche "sopravvissute" e
+  compilerà il blueprint
