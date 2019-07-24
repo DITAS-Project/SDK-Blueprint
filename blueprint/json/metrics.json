@@ -1,26 +1,100 @@
 {
-	"metrics": [
-		{
-			"name": "availability",
-			"unit": "percentage",
-			"maximum": "",
-			"minimum": ""
-		},
-		{
-			"name": "response_time",
-			"unit": "seconds",
-			"maximum": "",
-			"minimum": ""
-		},
-		{
-			"name": "throughput",
-			"unit": "bytesPerSecond",
-			"maximum": "",
-			"minimum": ""
-		}
-	
-	
-	]
-	
-	
+	"metrics": {
+			"dataUtility": [
+					{
+						"name": "accuracy",
+						"unit": "percentage",
+						"minimum": 0,
+						"maximum": 100
+					},
+					{
+						"name": "completeness",
+						"unit": "percentage",
+						"minimum": 0,
+						"maximum": 100
+					},
+					{
+						"name": "volume",
+						"unit": "tuple",
+						"minimum": 0,
+						"maximum": "infinite"
+					},
+					{
+						"name": "consistency",
+						"unit": "percentage",
+						"minimum": 0,
+						"maximum": 100
+					},
+					{
+						"name": "timeliness",
+						"unit": "percentage",
+						"minimum": 0,
+						"maximum": 100
+					},
+					{
+						"name": "precision",
+						"unit": "none",
+						"minimum": 0,
+						"maximum": "infinite"
+					},
+					{
+						"name": "availability",
+						"unit": "percentage",
+						"maximum": 0,
+						"minimum": 100
+					},
+					{
+						"name": "response_time",
+						"unit": "seconds",
+						"maximum": 0,
+						"minimum": "infinite"
+					},
+					{
+						"name": "throughput",
+						"unit": "megaBitPerSecond",
+						"maximum": 0,
+						"minimum": "infinite"
+					},
+					{
+						"name": "spaceGain",
+						"unit": "percentage",
+						"maximum": 0,
+						"minimum": "infinite"
+					},
+					{
+						"name": "spaceLimit",
+						"unit": "percentage",
+						"maximum": 0,
+						"minimum": 100
+					},
+					{
+						"name": "ramGain",
+						"unit": "percentage",
+						"maximum": 0,
+						"minimum": "infinite"
+					},
+					{
+						"name": "ramLimit",
+						"unit": "percentage",
+						"maximum": 0,
+						"minimum": 100
+					}
+			],
+			"security": [
+					{
+						"name": "securityTest",
+						"unit": "percentage",
+						"maximum": 0,
+						"minimum": 100
+					}
+			],
+			"privacy": [
+					{
+						"name": "privacyTest",
+						"unit": "percentage",
+						"maximum": 0,
+						"minimum": 100
+					}
+			]
+	}
 }
