@@ -81,20 +81,51 @@
 					}
 			],
 			"security": [
-					{
-						"name": "securityTest",
-						"unit": "percentage",
-						"maximum": 0,
-						"minimum": 100
-					}
+                            {
+                                "id": "encryption_AES128",
+                                "description": "Encryption AES 128",
+                                "type": "TransportEncryption",
+                                "properties": {
+                                    "protocol": {
+                                        "unit": "enum",
+                                        "value": "TLS1.3"
+                                    },
+                                    "algorithm": {
+                                        "unit": "list",
+                                        "value": ["TLS_AES_256_GCM_SHA384", "TLS_AES_128_GCM_SHA256", "TLS_AES_128_CCM_8_SHA256", "TLS_AES_128_CCM_SHA256"]
+                                    },
+                                    "keyLength": {
+                                        "unit": "number",
+                                        "value": 128
+                                    }
+                                }
+                            },
+                            {
+                                "id": "Access Control",
+                                "description": "Protocol",
+                                "type": "Protocol",
+                                "properties": {
+                                    "Protocol": {
+                                        "value": "Direct, OAuth"
+                                    },
+                                    "required": {
+                                        "value": "true"
+                                    }
+                                }
+                            }
 			],
 			"privacy": [
-					{
-						"name": "privacyTest",
-						"unit": "percentage",
-						"maximum": 0,
-						"minimum": 100
-					}
+                            {
+                                "id": "Purpose Control",
+                                "description": "Purpose Control",
+                                "type": "PurposeControl",
+                                "properties": {
+                                    "availablePurpose": {
+                                        "unit": "list",
+                                        "value": ["any"]
+                                    }
+                                }
+                            }
 			]
 	}
 }
