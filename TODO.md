@@ -1,5 +1,5 @@
 ### TODO
-#####Incontro del 10/07
+##### Incontro del 10/07
 
 - ~~aggiungere anche lo scheletro blueprint vuoto in vdc_template~~
 - ~~nel comando create, di default non viene fatto il push del bp generato,
@@ -33,11 +33,12 @@
   stessa cartella dei zip (d'ora in avanti data-management conterrà entrambe le informazioni)~~
 
 
-#####Incontro del 23/07
+##### Incontro del 23/07
 
-- Definire uno step intermedio tra repo-init e bp create in cui 
+- ~~Definire uno step intermedio tra repo-init e bp create in cui 
   per ogni metodo dell'API viene creato un file con tutte le metriche 
   possibili.
   L'utente potrebbe modificare manualmente queste liste per metodo, 
   invece la parte bp create prenderà solo le metriche "sopravvissute" e
-  compilerà il blueprint
+  compilerà il blueprint~~
+- Testare lo step precedente usando un VDC remoto invece che precedentemente scaricato in tmp
