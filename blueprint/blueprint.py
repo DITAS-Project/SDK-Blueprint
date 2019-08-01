@@ -335,3 +335,31 @@ def get_dict_from_file(path):
     else:
         print('Format file not recognized. Use .json or .yaml for ' + path)
         return ''
+
+
+def generate_api_metrics_files(vdc_repo_path):
+    # loading vdc_config_file
+    try:
+        vdc_config = VDCConfigFile(vdc_repo_path, VDC_CONFIG)
+    except MissingReferenceException:
+        raise FileNotFoundError('Missing file ' + VDC_CONFIG + 'in repo ' + vdc_repo_path)
+
+    # Retrieving API file
+    try:
+        api_path = vdc_config.get_api_path()
+        print('Opening api file: ' + api_path)
+        api = get_dict_from_file(api_path)
+        metrics_template_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
+    except MissingReferenceException as e:
+        e.print(VDC_CONFIG)
+
+    # For each method create a file with method name as prefix and
+    # copy the whole list of standard metrics as content
+    for method_raw in api[API_PATHS].keys():
+        method = method_raw.replace('/', '')
+        print("Creating metrics file for method '" + method + "'")
+        data_mgmt_path = vdc_config.get_data_management_path()
+        method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, method + "_metrics.json"))
+
+        with open(metrics_template_path, "r") as source, open(method_metrics_path, "w") as destination:
+            destination.write(source.read())

@@ -3,6 +3,7 @@ import os
 import shutil
 from repo import repo
 from blueprint.blueprint import Blueprint
+from blueprint import blueprint as bp
 from distutils.dir_util import copy_tree
 
 
@@ -73,7 +74,7 @@ def clone_repos(vdc_url, dal_urls):
     else:
         # Clone each DAL repo and merge information to blueprint
         # TODO: if the DAL URL is the same as VDC, prepare_repo_folder could cause some troubles
-        # TODO: create a subversion of the repo folder
+        # TODO: create a subversion of the repo folder or just skip this step
         for dal_url in dal_urls:
             print('Cloning DAL repository at ' + dal_url + '...')
             dal_repo_path = prepare_repo_folder(dal_url)
@@ -122,6 +123,17 @@ def handler_repo_init(args):
         repo.commit_and_push_all_changes(remote_repo, commit_msg)
 
 
+def handler_std_metrics(args):
+    if not args.local:
+        vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC, args.VDC)
+    else:
+        vdc_repo_path = os.path.join(os.getcwd(), TMP_DIR, args.VDC)
+
+    bp.generate_api_metrics_files(vdc_repo_path)
+
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='''DITAS SDK-Blueprint Generator.''')
@@ -156,6 +168,17 @@ if __name__ == "__main__":
     parser_repo_init.add_argument('type', choices=[VDC, DAL], help="Type of repository to create")
     parser_repo_init.add_argument('name', type=str, help='Repository name')
     parser_repo_init.set_defaults(func=handler_repo_init)
+
+    # Create the parser for the "std-metrics" command
+    parser_std_metrics = subparsers.add_parser('std-metrics', help='Create a json file for each API method with the '
+                                                                   'default data metrics. The path is specified by '
+                                                                   'the attribute "data-management" of the VDC '
+                                                                   'configuration file.')
+    parser_std_metrics.add_argument('VDC', type=str, help='VDC repository URL or directory name if already downloaded.')
+    parser_std_metrics.add_argument('-l', dest='local', action='store_true', required=False,
+                                    help='Specifies if the VDC repository has been already downloaded, i.e. the '
+                                         'provided argument is the name of repository')
+    parser_std_metrics.set_defaults(func=handler_std_metrics)
 
     args = parser.parse_args()
     args.func(args)
