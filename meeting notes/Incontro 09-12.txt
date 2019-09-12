@@ -1,0 +1,5 @@
+- cookbook_appendix: verrà copiato solo dal VDC, ci sarà un file JSON di 
+  cui copiare il contenuto. Nel file di configurazione sarà specificato 
+  il path al file.
+
+- documentare comando std-metrics della CLI
