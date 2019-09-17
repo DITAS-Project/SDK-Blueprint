@@ -68,6 +68,31 @@ The administrator should edit these files and remove those metrics which are not
 consistent with the specific method. Then the create or update command can be
 launched.
 
+### Scenarios
+
+##### Brand new project
+
+The administrator wants to create a new repository for either a VDC or DAL.
+1. To create one with the standard DITAS structure, the command to run is
+`repo-init`.
+
+2. Once the developers had implemented enough, in order to generate a blueprint
+the file `bp_gen_vdc.cfg`/`bp_gen_dal.cfg` has to be filled.
+
+3. One can specify the Data Quality, QoS, Security and Privacy metrics of the
+API methods to compute by running the `std-metrics` command.
+
+4. The blueprint can be generated
+  - from scratch (and replacing an existing one, if the file indicated by the attribute `blueprint` in the configuration file already exists) with the command `create`
+
+  - or by updating an existing one, specified by the attribute `blueprint` in the configuration file, with the command `update`. This command edit only the
+  sections that are mentioned in the configuration file.
+
+##### BP generation of existing VDC/DAL
+
+Refer to points 2, 3 and 4 of the "Brand new project scenario".
+
+
 ##### TODO
 
 Refer to [TODO file](https://github.com/DITAS-Project/SDK-Blueprint/blob/master/TODO.md)
