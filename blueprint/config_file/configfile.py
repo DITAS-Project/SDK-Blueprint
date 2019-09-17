@@ -3,9 +3,6 @@ import json
 import ntpath
 from abc import ABC
 
-# const referred to all config files
-COOKBOOK = 'cookbook'
-
 
 class ConfigFile(ABC):
     def __init__(self, repo_path, file_conf_path):
@@ -24,9 +21,6 @@ class ConfigFile(ABC):
 
     def get_path_from_section(self, section):
         return self.get_path(self.get_section(section), section)
-
-    def get_cookbook_path(self):
-        return self.get_path(self.get_section(COOKBOOK), COOKBOOK)
 
 
 class MissingReferenceException(Exception):

@@ -145,22 +145,10 @@ class Blueprint:
             e.print(VDC_CONFIG)
 
     def add_cookbook(self):
-        cookbook = {
-            VDC_SECTION: {},
-            DAL_SECTION: {}
-        }
         try:
-            with open(self.vdc_config.get_cookbook_path(), 'r') as vdc_cookbook:
-                cookbook[VDC_SECTION][self.vdc_config.repo_name] = vdc_cookbook.read()
+            self.bp[COOKBOOK_APPENDIX_SECTION] = get_dict_from_file(self.vdc_config.get_cookbook_path())
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
-        for dal_config in self.dal_configs:
-            try:
-                with open(dal_config.get_cookbook_path(), 'r') as dal_cookbook:
-                    cookbook[DAL_SECTION][dal_config.repo_name] = dal_cookbook.read()
-            except MissingReferenceException as e:
-                e.print(dal_config.repo_name)
-        self.bp[COOKBOOK_APPENDIX_SECTION] = cookbook
 
     def add_is_testing_output_data(self):
         try:

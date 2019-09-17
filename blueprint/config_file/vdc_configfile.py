@@ -7,6 +7,7 @@ FLOW = 'flow'
 FLOW_PLATFORM = 'platform'
 FLOW_PATH = 'source'
 API = 'api'
+COOKBOOK = 'cookbook'
 
 
 class VDCConfigFile(ConfigFile):
@@ -30,3 +31,6 @@ class VDCConfigFile(ConfigFile):
 
     def get_data_management_path(self):
         return super().get_path_from_section(DATA_MANAGEMENT)
+
+    def get_cookbook_path(self):
+        return super().get_path(super().get_section(COOKBOOK), COOKBOOK)
