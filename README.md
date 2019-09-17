@@ -5,12 +5,12 @@ This is the DITAS SDK CLI to generate a BluePrint starting from VDC and DALs rep
 ### CLI usage
 Running the command `python main.py -h` it is shown the helper of the CLI
 ```
-usage: main.py [-h] {create,update,repo-init} ...
+usage: main.py [-h] {create,update,repo-init,std-metrics} ...
 
 DITAS SDK-Blueprint Generator.
 
 positional arguments:
-  {create,update,repo-init}
+  {create,update,repo-init,std-metrics}
                         Sub-command to create or update a blueprint, or to
                         setup a new repository
     create              Generate a new blueprint. An already existing
@@ -20,6 +20,10 @@ positional arguments:
                         overwritten.
     repo-init           Create a new GitHub repository with the default
                         structure.
+    std-metrics         Create a json file for each API method with the
+                        default data metrics. The path is specified by the
+                        attribute "data-management" of the VDC configuration
+                        file.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -31,7 +35,7 @@ Using HTTPS, the CLI prompts GitHub username and password for cloning and pushin
 
 ### Examples
 
-For testing purposes, the [IDEKO use case](https://github.com/DITAS-Project/ideko-use-case/) has been cloned [here](https://github.com/caloc/ideko-copy). Both VDC and DALs configuration files have been added since this repository contains both modules.
+For testing purposes, the [IDEKO use case](https://github.com/DITAS-Project/ideko-use-case/) has been cloned [here](https://github.com/caloc/ideko-copy). Both VDC and DAL configuration files have been added since this repository contains both modules.
 
 ##### Create command
 
@@ -52,6 +56,17 @@ Other blueprint sections, including those that have been filled manually, are no
 `python main.py repo-init VDC newvdcname`
 
 This command will create a new VDC repository into the DITAS-Project GitHub organization and initializes it with the standard [VDC template](https://github.com/DITAS-Project/SDK-Blueprint/tree/master/vdc_template).
+
+##### Std-metrics command
+
+`python main.py std-metrics GIT_URL`
+
+This command will create a JSON file for each API method in the path set by the
+attribute "data-management" in the configuration file. The file contains all the
+Data Quality, QoS, Security and Privacy metrics that can be computed.
+The administrator should edit these files and remove those metrics which are not
+consistent with the specific method. Then the create or update command can be
+launched.
 
 ##### TODO
 
