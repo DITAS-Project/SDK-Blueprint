@@ -6,6 +6,9 @@ from blueprint.blueprint import Blueprint
 from blueprint import blueprint as bp
 from distutils.dir_util import copy_tree
 
+__author__ = "Cataldo Calò, Mirco Manzoni"
+__credits__ = ["Cataldo Calò", "Mirco Manzoni"]
+__status__ = "Development"
 
 
 '''

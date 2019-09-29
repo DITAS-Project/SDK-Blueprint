@@ -2,8 +2,27 @@
 
 This is the DITAS SDK CLI to generate a BluePrint starting from VDC and DALs repositories.
 
+### Requirements
+
+- git CLI installed on your system
+- A github account with read/write access to DITAS projects
+- A personal access token for git CLI: refer to the official 
+[guide](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line)
+- Create a file `github_access.json` (a file with this name will be ignored by git, because of the related entry in the 
+`.gitignore` file) in the main folder with the following structure
+```
+{
+	"access_token": "{your access token}"
+}
+```
+
+- Install the SDK-BluePrint with the command
+
+`sh install.sh`
+
+
 ### CLI usage
-Running the command `python main.py -h` it is shown the helper of the CLI
+Running the command `sh sdk-bp.sh -h` it is shown the helper of the CLI
 ```
 usage: main.py [-h] {create,update,repo-init,std-metrics} ...
 
@@ -45,7 +64,7 @@ Since no DAL_URL has been provided, the SDK assumes that the provided VDC_URL co
 
 ##### Update command
 
-`python main.py create git@github.com:caloc/ideko-copy.git`
+`sh sdk-bp.sh create git@github.com:caloc/ideko-copy.git`
 
 The same assumption described in the previous section applies.
 The update command locates the existing blueprint defined in the section "blueprint" of `bp_gen_vdc.cfg` and modifies only those sections affected by the information provided in the configuration file.
@@ -53,13 +72,13 @@ Other blueprint sections, including those that have been filled manually, are no
 
 ##### Repo-init command
 
-`python main.py repo-init VDC newvdcname`
+`sh sdk-bp.sh repo-init VDC newvdcname`
 
 This command will create a new VDC repository into the DITAS-Project GitHub organization and initializes it with the standard [VDC template](https://github.com/DITAS-Project/SDK-Blueprint/tree/master/vdc_template).
 
 ##### Std-metrics command
 
-`python main.py std-metrics GIT_URL`
+`sh sdk-bp.sh std-metrics GIT_URL`
 
 This command will create a JSON file for each API method in the path set by the
 attribute "data-management" in the configuration file. The file contains all the
