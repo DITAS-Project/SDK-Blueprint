@@ -37,8 +37,19 @@
 
 - ~~Definire uno step intermedio tra repo-init e bp create in cui 
   per ogni metodo dell'API viene creato un file con tutte le metriche 
-  possibili.
+  possibili.~~
   L'utente potrebbe modificare manualmente queste liste per metodo, 
   invece la parte bp create prenderà solo le metriche "sopravvissute" e
   compilerà il blueprint~~
 - Testare lo step precedente usando un VDC remoto invece che precedentemente scaricato in tmp
+
+##### Incontro del 25/09
+
+- ~~provare se si riesce a installare senza problemi su macchina vuota
+  (nello specifico senza git)~~
+- ~~fare uno shell script per l'installazione del programma~~
+- un nuovo comando 'publish' per fare una chiamata REST POST al servizio
+  di pubblicazione blueprint 
+- fare anche un 'unpublish'
+
+- ~~Mettere i nomi al codice~~

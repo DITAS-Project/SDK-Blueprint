@@ -4,6 +4,7 @@ This is the DITAS SDK CLI to generate a BluePrint starting from VDC and DALs rep
 
 ### Requirements
 
+- Python installed, version >= 3.7
 - git CLI installed on your system
 - A github account with read/write access to DITAS projects
 - A personal access token for git CLI: refer to the official 

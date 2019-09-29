@@ -1,0 +1,10 @@
+# Elasticsearch 7.x
+elasticsearch>=7.0.0, <8.0.0
+# PyYAML
+pyyaml>=5.1
+# Requests
+requests>=2.22.0
+# Pytz
+pytz >= 2018.9
+# GitPython
+gitpython>=2.1.11
