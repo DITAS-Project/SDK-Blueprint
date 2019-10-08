@@ -102,9 +102,9 @@ def handler_repo_init(args):
         repo_name = args.name
 
         # This will create a repo in the org DITAS-Project. DO NOT SPAM
-        #resp = repo.create_ditas_repo(repo_name)
+        resp = repo.create_ditas_repo(repo_name)
         # TODO: delete next line when testing is complete and uncomment the previous one
-        resp = repo.create_personal_repo(repo_name)
+        #resp = repo.create_personal_repo(repo_name)
         print(resp['html_url'])
         repo_url = resp['html_url']
 
