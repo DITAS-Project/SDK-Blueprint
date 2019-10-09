@@ -59,7 +59,7 @@ For testing purposes, the [IDEKO use case](https://github.com/DITAS-Project/idek
 
 ##### Create command
 
-`python main.py create git@github.com:caloc/ideko-copy.git`
+`sh sdk-bp.sh create git@github.com:caloc/ideko-copy.git`
 
 Since no DAL_URL has been provided, the SDK assumes that the provided VDC_URL contains both of them. So it looks for both VDC and DAL configuration files. This command will generate a brand new BluePrint and store it at the location defined in the section "blueprint" of `bp_gen_vdc.cfg`
 
