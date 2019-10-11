@@ -80,7 +80,8 @@ def clone_repos(vdc_url, dal_urls):
         # TODO: create a subversion of the repo folder or just skip this step
         for dal_url in dal_urls:
             print('Cloning DAL repository at ' + dal_url + '...')
-            dal_repo_path = prepare_repo_folder(dal_url)
+            repo_name = extract_repo_name(dal_url)
+            dal_repo_path = prepare_repo_folder(repo_name)
             repo.clone_repo(dal_url, dal_repo_path)
             dal_repo_paths.append(dal_repo_path)
 
