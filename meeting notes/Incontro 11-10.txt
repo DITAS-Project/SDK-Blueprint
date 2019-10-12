@@ -1,0 +1,7 @@
+Sequenza VDC
+sh sdk-bp.sh repo-init VDC newvdcname
+swagger di DUE-VDC copiato in newvdcname
+aggiornato file conf
+sh sdk-bp.sh std-metrics (in locale)
+push su git
+sh sdk-bp.sh create git@github.com:caloc/newvdcname
