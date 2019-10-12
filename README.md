@@ -79,11 +79,16 @@ This command will create a new VDC repository into the DITAS-Project GitHub orga
 
 ##### Std-metrics command
 
+Requirements: attributes to be set in the `bp_gen_vdc.cfg` file in order to run the command
+1. "api": path to the swagger, normally in the standard subfolder "api/"
+2. "data-management": path to the folder which will contain the zip files with sample data of each API method.
+Normally "api_data_samples"
+
 `sh sdk-bp.sh std-metrics GIT_URL`
 
-This command will create a JSON file for each API method in the path set by the
-attribute "data-management" in the configuration file. The file contains all the
-Data Quality, QoS, Security and Privacy metrics that can be computed.
+This command will create a JSON file for each API method of the VDC. The files will be written
+in the path specified by the "data-management" attribute in the configuration file. 
+The file contains all the Data Quality, QoS, Security and Privacy metrics that can be computed.
 The administrator should edit these files and remove those metrics which are not
 consistent with the specific method. Then the create or update command can be
 launched.
