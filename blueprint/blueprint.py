@@ -344,10 +344,14 @@ def generate_api_metrics_files(vdc_repo_path):
     # For each method create a file with method name as prefix and
     # copy the whole list of standard metrics as content
     for method_raw in api[API_PATHS].keys():
-        method = method_raw.replace('/', '')
+        method = method_raw.strip("/")
+        method = method.replace("/", "-")
         print("Creating metrics file for method '" + method + "'")
         data_mgmt_path = vdc_config.get_data_management_path()
         method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, method + "_metrics.json"))
+
+        print("metrics_template_path", metrics_template_path)
+        print("method_metrics_path", method_metrics_path)
 
         with open(metrics_template_path, "r") as source, open(method_metrics_path, "w") as destination:
             destination.write(source.read())

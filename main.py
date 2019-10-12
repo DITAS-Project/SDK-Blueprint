@@ -11,13 +11,6 @@ __credits__ = ["Cataldo Calò", "Mirco Manzoni"]
 __status__ = "Development"
 
 
-'''
-due_vdc_url = 'https://github.com/DITAS-Project/DUE-VDC'
-git_url = 'git@github.com:DITAS-Project/DUE-VDC.git'
-
-repo.clone_repo(due_vdc_url, git_url)
-'''
-
 TMP_DIR = 'tmp'
 VDC_TEMPLATE = 'vdc_template'
 DAL_TEMPLATE = 'dal_template'
@@ -64,37 +57,45 @@ def prepare_repo_folder(repo_name):
 
 
 def clone_repos(vdc_url, dal_urls):
+    print('clone_repos function, URLs: ', vdc_url, ', ', dal_urls)
     print('Cloning VDC repository at ' + vdc_url + '...')
     # Clone VDC repo and extract info to generate Blueprint
     repo_name = extract_repo_name(vdc_url)
     vdc_repo_path = prepare_repo_folder(repo_name)
     vdc_repo = repo.clone_repo(vdc_url, vdc_repo_path)
 
-    # If DAL URLs list is empty, then just extract DAL info from already cloned VDC repo
     dal_repo_paths = []
-    if not dal_urls:
-        dal_repo_paths.append(vdc_repo_path)
-    else:
-        # Clone each DAL repo and merge information to blueprint
-        # TODO: if the DAL URL is the same as VDC, prepare_repo_folder could cause some troubles
-        # TODO: create a subversion of the repo folder or just skip this step
-        for dal_url in dal_urls:
-            print('Cloning DAL repository at ' + dal_url + '...')
-            repo_name = extract_repo_name(dal_url)
-            dal_repo_path = prepare_repo_folder(repo_name)
+    # Clone each DAL repo and merge information to blueprint
+    for dal_url in dal_urls:
+        print('Cloning DAL repository at ' + dal_url + '...')
+        repo_name = extract_repo_name(dal_url)
+        dal_repo_path = prepare_repo_folder(repo_name)
+        # if the DAL URL is the same as VDC, prepare_repo_folder could cause some troubles
+        # Just skip this step
+        if dal_url != vdc_url:
             repo.clone_repo(dal_url, dal_repo_path)
-            dal_repo_paths.append(dal_repo_path)
+        dal_repo_paths.append(dal_repo_path)
 
     return vdc_repo, vdc_repo_path, dal_repo_paths
 
 
 def handler_create(args):
-    vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, args.DAL_URL)
+    dal_urls = []
+    if not args.DAL_URL:
+        dal_urls.append(args.VDC_URL)
+    else:
+        dal_urls = args.DAL_URL
+    vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, dal_urls)
     generate_blueprint(vdc_repo, vdc_repo_path, dal_repo_paths, False, args.push)
 
 
 def handler_update(args):
-    vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, args.DAL_URL)
+    dal_urls = []
+    if not args.DAL_URL:
+        dal_urls.append(args.VDC_URL)
+    else:
+        dal_urls = args.DAL_URL
+    vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, dal_urls)
     generate_blueprint(vdc_repo, vdc_repo_path, dal_repo_paths, True, args.push)
 
 
@@ -128,14 +129,14 @@ def handler_repo_init(args):
 
 
 def handler_std_metrics(args):
+    print("args: ", args)
+    # Metrics are computed only for VDC
     if not args.local:
-        vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC, args.VDC)
+        vdc_repo, vdc_repo_path, _ = clone_repos(args.VDC, [])
     else:
         vdc_repo_path = os.path.join(os.getcwd(), TMP_DIR, args.VDC)
 
     bp.generate_api_metrics_files(vdc_repo_path)
-
-
 
 
 if __name__ == "__main__":
