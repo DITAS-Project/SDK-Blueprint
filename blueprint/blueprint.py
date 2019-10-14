@@ -220,7 +220,7 @@ class Blueprint:
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_DATA_SOURCES] = data_sources
 
     def add_data_management(self):
-        #try:
+        try:
             api_path = self.vdc_config.get_api_path()
             print('Gathering methods info from API file')
             api = get_dict_from_file(api_path)
@@ -296,10 +296,10 @@ class Blueprint:
                 data_mgmt_list.append(dm_elem)
 
             self.bp[DATA_MANAGEMENT_SECTION] = data_mgmt_list
-        #except TypeError:
-        #    print('API file corrupted!\nCannot extract methods info from API file')
-        #except MissingReferenceException as e:
-        #    e.print(VDC_CONFIG)
+        except TypeError:
+            print('API file corrupted!\nCannot extract methods info from API file')
+        except MissingReferenceException as e:
+            e.print(VDC_CONFIG)
 
     def save(self):
         file_path = self.vdc_config.get_blueprint_path()
