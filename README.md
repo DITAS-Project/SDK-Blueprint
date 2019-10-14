@@ -4,6 +4,7 @@ This is the DITAS SDK CLI to generate a BluePrint starting from VDC and DALs rep
 
 ### Requirements
 
+- Python installed, version >= 3.7
 - git CLI installed on your system
 - A github account with read/write access to DITAS projects
 - A personal access token for git CLI: refer to the official 
@@ -58,7 +59,7 @@ For testing purposes, the [IDEKO use case](https://github.com/DITAS-Project/idek
 
 ##### Create command
 
-`python main.py create git@github.com:caloc/ideko-copy.git`
+`sh sdk-bp.sh create git@github.com:caloc/ideko-copy.git`
 
 Since no DAL_URL has been provided, the SDK assumes that the provided VDC_URL contains both of them. So it looks for both VDC and DAL configuration files. This command will generate a brand new BluePrint and store it at the location defined in the section "blueprint" of `bp_gen_vdc.cfg`
 
@@ -78,11 +79,16 @@ This command will create a new VDC repository into the DITAS-Project GitHub orga
 
 ##### Std-metrics command
 
+Requirements: attributes to be set in the `bp_gen_vdc.cfg` file in order to run the command
+1. "api": path to the swagger, normally in the standard subfolder "api/"
+2. "data-management": path to the folder which will contain the zip files with sample data of each API method.
+Normally "api_data_samples"
+
 `sh sdk-bp.sh std-metrics GIT_URL`
 
-This command will create a JSON file for each API method in the path set by the
-attribute "data-management" in the configuration file. The file contains all the
-Data Quality, QoS, Security and Privacy metrics that can be computed.
+This command will create a JSON file for each API method of the VDC. The files will be written
+in the path specified by the "data-management" attribute in the configuration file. 
+The file contains all the Data Quality, QoS, Security and Privacy metrics that can be computed.
 The administrator should edit these files and remove those metrics which are not
 consistent with the specific method. Then the create or update command can be
 launched.
