@@ -67,33 +67,35 @@ def clone_repos(vdc_url, dal_urls):
     dal_repo_paths = []
     # Clone each DAL repo and merge information to blueprint
     for dal_url in dal_urls:
-        print('Cloning DAL repository at ' + dal_url + '...')
-        repo_name = extract_repo_name(dal_url)
-        dal_repo_path = prepare_repo_folder(repo_name)
         # if the DAL URL is the same as VDC, prepare_repo_folder could cause some troubles
         # Just skip this step
         if dal_url != vdc_url:
+            print('Cloning DAL repository at ' + dal_url + '...')
+            repo_name = extract_repo_name(dal_url)
+            dal_repo_path = prepare_repo_folder(repo_name)
             repo.clone_repo(dal_url, dal_repo_path)
-        dal_repo_paths.append(dal_repo_path)
+            dal_repo_paths.append(dal_repo_path)
+        else:
+            print('DAL URL is the same as VDC: skipping cloning step...')
+            dal_repo_paths.append(vdc_repo_path)
 
     return vdc_repo, vdc_repo_path, dal_repo_paths
 
 
 def handler_create(args):
-    dal_urls = []
-    if not args.DAL_URL:
-        dal_urls.append(args.VDC_URL)
-    else:
+    dal_urls = [args.VDC_URL]
+    if args.DAL_URL:
         dal_urls = args.DAL_URL
     vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, dal_urls)
+    print("vdc_repo, vdc_repo_path, dal_repo_paths")
+    print(vdc_repo, vdc_repo_path, dal_repo_paths)
+    #return
     generate_blueprint(vdc_repo, vdc_repo_path, dal_repo_paths, False, args.push)
 
 
 def handler_update(args):
-    dal_urls = []
-    if not args.DAL_URL:
-        dal_urls.append(args.VDC_URL)
-    else:
+    dal_urls = [args.VDC_URL]
+    if args.DAL_URL:
         dal_urls = args.DAL_URL
     vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, dal_urls)
     generate_blueprint(vdc_repo, vdc_repo_path, dal_repo_paths, True, args.push)
