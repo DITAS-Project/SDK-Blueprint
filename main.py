@@ -1,5 +1,6 @@
 import argparse
 import os
+import requests
 import shutil
 from repo import repo
 from blueprint.blueprint import Blueprint
@@ -87,9 +88,6 @@ def handler_create(args):
     if args.DAL_URL:
         dal_urls = args.DAL_URL
     vdc_repo, vdc_repo_path, dal_repo_paths = clone_repos(args.VDC_URL, dal_urls)
-    print("vdc_repo, vdc_repo_path, dal_repo_paths")
-    print(vdc_repo, vdc_repo_path, dal_repo_paths)
-    #return
     generate_blueprint(vdc_repo, vdc_repo_path, dal_repo_paths, False, args.push)
 
 
@@ -128,6 +126,25 @@ def handler_repo_init(args):
 
         # Commit and push the new structure
         repo.commit_and_push_all_changes(remote_repo, commit_msg)
+
+
+def handler_publish(args):
+    if not os.path.exists(args.file):
+        print("File does not exist!")
+        return
+    body = bp.get_dict_from_file(args.file)
+    api_endpoint = args.server + '/blueprints'
+
+    print("Trying to make a POST to: ", api_endpoint)
+    #print("body: ", body)
+    r = requests.post(url=api_endpoint, data=body)
+
+    if r.ok:
+        print("Blueprint published successfully.")
+    else:
+        print(r.status_code)
+
+
 
 
 def handler_std_metrics(args):
@@ -186,6 +203,14 @@ if __name__ == "__main__":
                                     help='Specifies if the VDC repository has been already downloaded, i.e. the '
                                          'provided argument is the name of repository')
     parser_std_metrics.set_defaults(func=handler_std_metrics)
+
+    parser_publish = subparsers.add_parser(name='publish', help="Publish blueprint to ICCS repository.")
+    parser_publish.add_argument('file', type=str, help='Path to blueprint file to be published.')
+    parser_publish.add_argument('-server', type=str, default='https://localhost:8080',
+                                help='Hostname of the ICCS repository, including protocol. '
+                                     'For example: https://example.com:8080')
+    parser_publish.add_argument('-basename', type=str, default='http', help='')
+    parser_publish.set_defaults(func=handler_publish)
 
     args = parser.parse_args()
     args.func(args)
