@@ -25,12 +25,12 @@ This is the DITAS SDK CLI to generate a BluePrint starting from VDC and DALs rep
 ### CLI usage
 Running the command `sh sdk-bp.sh -h` it is shown the helper of the CLI
 ```
-usage: main.py [-h] {create,update,repo-init,std-metrics} ...
+usage: main.py [-h] {create,update,repo-init,std-metrics,publish,unpublish} ...
 
 DITAS SDK-Blueprint Generator.
 
 positional arguments:
-  {create,update,repo-init,std-metrics}
+  {create,update,repo-init,std-metrics,publish,unpublish}
                         Sub-command to create or update a blueprint, or to
                         setup a new repository
     create              Generate a new blueprint. An already existing
@@ -44,6 +44,8 @@ positional arguments:
                         default data metrics. The path is specified by the
                         attribute "data-management" of the VDC configuration
                         file.
+    publish             Publish blueprint to ICCS repository.
+    unpublish           Unpublish blueprint from ICCS repository.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -65,7 +67,7 @@ Since no DAL_URL has been provided, the SDK assumes that the provided VDC_URL co
 
 ##### Update command
 
-`sh sdk-bp.sh create git@github.com:caloc/ideko-copy.git`
+`sh sdk-bp.sh update git@github.com:caloc/ideko-copy.git`
 
 The same assumption described in the previous section applies.
 The update command locates the existing blueprint defined in the section "blueprint" of `bp_gen_vdc.cfg` and modifies only those sections affected by the information provided in the configuration file.
@@ -93,6 +95,18 @@ The administrator should edit these files and remove those metrics which are not
 consistent with the specific method. Then the create or update command can be
 launched.
 
+##### Publish command
+
+`sh sdk-bp.sh publish blueprint_path`
+
+This command will publish to the ICCS repository the generated blueprint.
+
+##### Unpublish command
+
+`sh sdk-bp.sh unpublish blueprint_id`
+
+This command will unpublish from the ICCS repository the blueprint identified by `blueprint_id`.
+
 ### Scenarios
 
 ##### Brand new project
@@ -113,9 +127,13 @@ API methods to compute by running the `std-metrics` command.
   - or by updating an existing one, specified by the attribute `blueprint` in the configuration file, with the command `update`. This command edit only the
   sections that are mentioned in the configuration file.
 
+5. Once the blueprint is generated, it can be published into ICCS repository by executing the command `publish`.
+
+6. The blueprint can be unpublished by executing the command `unpublish`.
+
 ##### BP generation of existing VDC/DAL
 
-Refer to points 2, 3 and 4 of the "Brand new project scenario".
+Refer to points from 2 to 6 of the "Brand new project scenario".
 
 
 ##### TODO

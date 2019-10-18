@@ -10,9 +10,9 @@
 - ~~rendere la generazione del blueprint libera da crash dovuti a campi
   all'interno dei file di configurazione lasciati vuoti~~
 
-- cookbook_appendix: bisogna unire file provienienti da vdc e dal, in
+- ~~cookbook_appendix: bisogna unire file provienienti da vdc e dal, in
   qualche modo. In attesa di indicazioni da Giovanni
-- aggiungere print per lo stato della generazione del blueprint, sezione
+- ~~aggiungere print per lo stato della generazione del blueprint, sezione
   cookbook
 
 
@@ -51,6 +51,7 @@
 - ~~un nuovo comando 'publish' per fare una chiamata REST POST al servizio
   di pubblicazione blueprint~~
   -> To be tested with a running instance of ICCS repository
-- fare anche un 'unpublish'
+- ~~fare anche un 'unpublish'
+  -> To be tested with a running instance of ICCS repository
 
 - ~~Mettere i nomi al codice~~

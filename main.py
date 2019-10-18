@@ -145,6 +145,15 @@ def handler_publish(args):
         print(r.status_code)
 
 
+def handler_unpublish(args):
+    api_endpoint = args.server + '/blueprints'
+    print("Trying to make a DELETE to: ", api_endpoint)
+    r = requests.delete(url=api_endpoint, data=args.blueprint)
+
+    if r.ok:
+        print("Blueprint unpublished successfully.")
+    else:
+        print(r.status_code)
 
 
 def handler_std_metrics(args):
@@ -211,6 +220,14 @@ if __name__ == "__main__":
                                      'For example: https://example.com:8080')
     parser_publish.add_argument('-basename', type=str, default='http', help='')
     parser_publish.set_defaults(func=handler_publish)
+
+    parser_unpublish = subparsers.add_parser(name='unpublish', help="Unpublish blueprint from ICCS repository.")
+    parser_unpublish.add_argument('blueprint', type=str, help='Blueprint ID to be unpublished.')
+    parser_unpublish.add_argument('-server', type=str, default='https://localhost:8080',
+                                help='Hostname of the ICCS repository, including protocol. '
+                                     'For example: https://example.com:8080')
+    parser_unpublish.add_argument('-basename', type=str, default='http', help='')
+    parser_unpublish.set_defaults(func=handler_unpublish)
 
     args = parser.parse_args()
     args.func(args)
