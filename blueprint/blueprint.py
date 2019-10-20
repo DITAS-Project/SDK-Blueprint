@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import copy
@@ -69,7 +70,15 @@ METRIC_UNIT = 'unit'
 METRIC_MAXIMUM = 'maximum'
 METRIC_MINIMUM = 'minimum'
 
+
+def datetime_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")
+
+
 class Blueprint:
+
     def __init__(self, vdc_repo_path, dal_repo_paths, update=False):
         ''' 
         loading template and blueprint:
@@ -98,11 +107,14 @@ class Blueprint:
             print("Trying to open existing blueprint at " + self.vdc_config.get_blueprint_path())
             self.bp = get_dict_from_file(self.vdc_config.get_blueprint_path())
 
+
     def add_exposed_api(self):
         try:
             path = self.vdc_config.get_api_path()
             print('Opening api file: ' + path)
-            self.bp[EXPOSED_API_SECTION] = get_dict_from_file(path)
+            temp = get_dict_from_file(path)
+            print("temp_api: ", temp)
+            self.bp[EXPOSED_API_SECTION] = temp
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
 
@@ -112,6 +124,7 @@ class Blueprint:
             print('Gathering methods info from API file')
             api = get_dict_from_file(path)
             tags = []
+
             for method in api[API_PATHS].keys():
                 #print("Found method: ", method.strip("/"))
                 tag_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS][0])
@@ -246,9 +259,9 @@ class Blueprint:
                 print("Gathering metrics of method " + method_raw + " from " + method_metrics_path)
                 metrics = get_dict_from_file(method_metrics_path)
 
-                print("dm_elem: ", dm_elem)
-                print("DM_EL_ATTRIBUTES: ", DM_EL_ATTRIBUTES)
-                print("metrics: ", metrics)
+                #print("dm_elem: ", dm_elem)
+                #print("DM_EL_ATTRIBUTES: ", DM_EL_ATTRIBUTES)
+                #print("metrics: ", metrics)
 
                 dm_elem[DM_EL_ATTRIBUTES] = copy.deepcopy(metrics)
 
@@ -329,7 +342,7 @@ class Blueprint:
         print("Saving blueprint at " + file_path)
         print("bp: ", self.bp)
         with open(file_path, 'w') as outfile:
-            json.dump(self.bp, outfile, indent=4)
+            json.dump(self.bp, outfile, indent=4, default=datetime_handler)
 
 
 # supported extension for dictionaries
