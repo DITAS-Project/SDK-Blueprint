@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import copy
@@ -64,13 +65,20 @@ EXPOSED_API_SECTION = 'EXPOSED_API'
 API_PATHS = 'paths'
 
 # const referred to the metrics file
-METRICS_ROOT = 'metrics'
 METRIC_NAME = 'name'
 METRIC_UNIT = 'unit'
 METRIC_MAXIMUM = 'maximum'
 METRIC_MINIMUM = 'minimum'
 
+
+def datetime_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")
+
+
 class Blueprint:
+
     def __init__(self, vdc_repo_path, dal_repo_paths, update=False):
         ''' 
         loading template and blueprint:
@@ -99,11 +107,14 @@ class Blueprint:
             print("Trying to open existing blueprint at " + self.vdc_config.get_blueprint_path())
             self.bp = get_dict_from_file(self.vdc_config.get_blueprint_path())
 
+
     def add_exposed_api(self):
         try:
             path = self.vdc_config.get_api_path()
             print('Opening api file: ' + path)
-            self.bp[EXPOSED_API_SECTION] = get_dict_from_file(path)
+            temp = get_dict_from_file(path)
+            print("temp_api: ", temp)
+            self.bp[EXPOSED_API_SECTION] = temp
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
 
@@ -113,9 +124,11 @@ class Blueprint:
             print('Gathering methods info from API file')
             api = get_dict_from_file(path)
             tags = []
+
             for method in api[API_PATHS].keys():
+                #print("Found method: ", method.strip("/"))
                 tag_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS][0])
-                tag_template[IS_OW_TAGS_METHODID] = method.replace('/', '')
+                tag_template[IS_OW_TAGS_METHODID] = method.strip("/")
                 tags.append(tag_template)
             self.bp[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS] = tags
         except TypeError:
@@ -158,13 +171,14 @@ class Blueprint:
             print('Zip files at ' + zip_path)
             for method in api[API_PATHS].keys():
                 outdata_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA][0])
-                method = method.replace('/', '')
+                method = method.strip("/")
                 outdata_template[IS_TOD_METHODID] = method
-                zip_file = os.path.join(zip_path, method + ZIP_FORMAT)
+                zip_file = os.path.join(zip_path, method.replace("/", "-") + ZIP_FORMAT)
                 print('Searching for ' + zip_file)
                 if os.path.exists(zip_file):
                     print('Zip file found!')
-                    outdata_template[IS_TOD_ZIP] = os.path.join(self.vdc_config.get_data_management(), method + ZIP_FORMAT)
+                    outdata_template[IS_TOD_ZIP] = os.path.join(self.vdc_config.get_data_management(),
+                                                                method.replace("/", "-") + ZIP_FORMAT)
                 else:
                     print('Zip file not found!')
                     outdata_template[IS_TOD_ZIP] = ''
@@ -226,35 +240,53 @@ class Blueprint:
             api = get_dict_from_file(api_path)
             metrics_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
             print('Gathering standard metrics from: ' + metrics_path)
-            dm_du_pr_se_elem = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER,
-                                                                               DM_EL_ATT_DU_PR_SE_STRUCTURE)))
-            dm_du_pr_se_elem_prop = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER,
-                                                                                    JSON_TEMPLATES_FOLDER,
-                                                                                    DM_EL_ATT_DU_PR_SE_PROPERTIES_STRUCTURE)))
+            #dm_du_pr_se_elem = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER,
+            #                                                                   DM_EL_ATT_DU_PR_SE_STRUCTURE)))
+            #dm_du_pr_se_elem_prop = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER,
+            #                                                                        JSON_TEMPLATES_FOLDER,
+            #                                                                        DM_EL_ATT_DU_PR_SE_PROPERTIES_STRUCTURE)))
 
             data_mgmt_list = []
             for method_raw in api[API_PATHS].keys():
-                method = method_raw.replace('/', '')
+                method_raw = method_raw.strip("/")
+                method = method_raw.replace("/", "-")
                 dm_elem = copy.deepcopy(self.template[DATA_MANAGEMENT_SECTION][0])
-                dm_elem[DM_EL_METHOD_ID] = method
+                dm_elem[DM_EL_METHOD_ID] = method_raw
                 # Fill ATTRIBUTES section of each method element
                 data_mgmt_path = self.vdc_config.get_data_management_path()
                 method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, method + "_metrics.json"))
+
+                print("Gathering metrics of method " + method_raw + " from " + method_metrics_path)
                 metrics = get_dict_from_file(method_metrics_path)
-                print("Gathering metrics of method " + method + " from " + method_metrics_path)
+
+                #print("dm_elem: ", dm_elem)
+                #print("DM_EL_ATTRIBUTES: ", DM_EL_ATTRIBUTES)
+                #print("metrics: ", metrics)
+
+                dm_elem[DM_EL_ATTRIBUTES] = copy.deepcopy(metrics)
+
+                '''
                 # Fill dataUtility elements
                 for metric in metrics[METRICS_ROOT][DM_METRICS_DATA_UTILITY]:
                     # Extract template as a copy of the structure taken from file
                     dm_metric_elem = copy.deepcopy(dm_du_pr_se_elem)
                     dm_metric_elem_prop = copy.deepcopy(dm_du_pr_se_elem_prop)
                     # Fill the structure
+                    print("metric: ", metric)
+                    print("dm_metric_elem: ", dm_metric_elem)
+                    print("METRIC_NAME: ", METRIC_NAME)
+                    print("DM_EL_ATT_DU_PR_SE_ID: ", DM_EL_ATT_DU_PR_SE_ID)
                     dm_metric_elem[DM_EL_ATT_DU_PR_SE_ID] = metric[METRIC_NAME]
-                    # TODO: name and type missing
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT] = metric[METRIC_UNIT]
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX] = metric[METRIC_MAXIMUM]
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MIN] = metric[METRIC_MINIMUM]
+                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_NAME] = metric[METRIC_NAME]
+                    # TODO: what goes into 'type' property?
+                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_TYPE] = metric[METRIC_NAME]
+                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_PROPERTIES] = metric[METRIC_NAME]
+
+                    #dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT] = metric[METRIC_UNIT]
+                    #dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX] = metric[METRIC_MAXIMUM]
+                    #dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MIN] = metric[METRIC_MINIMUM]
                     # TODO: where to get the metrics value??
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_VALUE] = metric[METRIC_UNIT]
+                    #dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_VALUE] = metric[METRIC_UNIT]
 
                     dm_metric_elem[DM_EL_ATT_DU_PR_SE_PROPERTIES] = {metric[METRIC_NAME]: dm_metric_elem_prop}
                     dm_elem[DM_EL_ATTRIBUTES][DM_EL_ATT_DATA_UTILITY].append(dm_metric_elem)
@@ -265,7 +297,10 @@ class Blueprint:
                     dm_metric_elem = copy.deepcopy(dm_du_pr_se_elem)
                     dm_metric_elem_prop = copy.deepcopy(dm_du_pr_se_elem_prop)
                     # Fill the structure
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_ID] = metric[METRIC_NAME]
+                    print("metric: ", metric)
+                    print("Trying to access key METRIC_NAME=", METRIC_NAME)
+                    temp_value = metric[METRIC_NAME]
+                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_ID] = temp_value
                     # TODO: name and type missing
                     dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT] = metric[METRIC_UNIT]
                     dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX] = metric[METRIC_MAXIMUM]
@@ -293,6 +328,7 @@ class Blueprint:
                     dm_metric_elem[DM_EL_ATT_DU_PR_SE_PROPERTIES] = {metric[METRIC_NAME]: dm_metric_elem_prop}
                     dm_elem[DM_EL_ATTRIBUTES][DM_EL_ATT_SECURITY].append(dm_metric_elem)
 
+                '''
                 data_mgmt_list.append(dm_elem)
 
             self.bp[DATA_MANAGEMENT_SECTION] = data_mgmt_list
@@ -304,8 +340,9 @@ class Blueprint:
     def save(self):
         file_path = self.vdc_config.get_blueprint_path()
         print("Saving blueprint at " + file_path)
+        print("bp: ", self.bp)
         with open(file_path, 'w') as outfile:
-            json.dump(self.bp, outfile, indent=4)
+            json.dump(self.bp, outfile, indent=4, default=datetime_handler)
 
 
 # supported extension for dictionaries
