@@ -112,9 +112,7 @@ class Blueprint:
         try:
             path = self.vdc_config.get_api_path()
             print('Opening api file: ' + path)
-            temp = get_dict_from_file(path)
-            print("temp_api: ", temp)
-            self.bp[EXPOSED_API_SECTION] = temp
+            self.bp[EXPOSED_API_SECTION] = get_dict_from_file(path)
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
 
@@ -340,7 +338,6 @@ class Blueprint:
     def save(self):
         file_path = self.vdc_config.get_blueprint_path()
         print("Saving blueprint at " + file_path)
-        print("bp: ", self.bp)
         with open(file_path, 'w') as outfile:
             json.dump(self.bp, outfile, indent=4, default=datetime_handler)
 
