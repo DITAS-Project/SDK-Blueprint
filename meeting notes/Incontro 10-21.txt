@@ -1,0 +1,22 @@
+DOMANDE
+
+1. elementi degli array dataUtility/privacy/security: 
+se l'interpretazione delle specifiche DITAS_3.3 è sbagliata, come sono 
+fatti gli oggetti e cosa vuol dire 'additionalProperties'?
+-> anche se la specifica è stata aggiornata, si continua con gli oggetti
+   come in DITAS_3.2.
+-> in attesa di modifica del file blueprint/json/metrics.json da parte
+   di Giovanni prima di sistemare il codice per "DATA_MANAGEMENT"
+
+------------------------------
+
+MODIFICHE
+
+- blueprint/json/metrics.json
+    - id: uuid, qualsiasi roba:
+    - name -> description:
+    - type: "accuracy"
+    - properties: nome dell'oggetto uguale a type
+
+------------------------------
+
