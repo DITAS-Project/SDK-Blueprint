@@ -107,6 +107,72 @@ This command will publish to the ICCS repository the generated blueprint.
 
 This command will unpublish from the ICCS repository the blueprint identified by `blueprint_id`.
 
+##### bp_gen_vdc.cfg json schema
+
+```
+{
+    "type": "object",
+    "required": [
+      "blueprint",
+      "flow",
+      "data-management",
+      "cookbook",
+      "api"
+     ],
+     "properties": {
+      "blueprint": {
+        "description": "Path to the file where the application saves the blueprint",
+        "type": "string"
+      },
+      "flow": {
+        "type": "object",
+        "required": [
+          "platform"
+        ],
+        "properties": {
+          "platform": {
+             "description": "Name of used platform"
+             "type": "string"
+          },
+          "source": {
+            "description": "Path to the file where the flow is saved. Required only in case of Node-Red platform",
+            "type": "string"
+          }
+        }
+       },
+       "data-management": {
+        "description": "Path to the directory containing zip and metrics files",
+        "type": "string"
+       },
+       "cookbook": {
+        "description": "Path to the cookbook file",
+        "type": "string",
+       },
+       "api": {
+        "description": "Path to the swagger file",
+        "type": "string",
+       }
+     }
+}
+```
+
+##### bp_gen_dal.cfg json schema
+
+```
+{
+    "type": "object",
+    "required": [
+      "main_proto"
+     ],
+     "properties": {
+      "main_proto": {
+        "description": "Path to the main proto file. The main proto file is the file that doed not depend from other proto files",
+        "type": "string"
+      }
+     }
+}
+```
+
 ### Scenarios
 
 ##### Brand new project
