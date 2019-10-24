@@ -11,6 +11,9 @@ from blueprint.config_file.configfile import MissingReferenceException
 
 BLUEPRINT_FOLDER = 'blueprint'
 JSON_TEMPLATES_FOLDER = 'json'
+
+DM_JSON_TEMPLATE = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, 'data_management.json'))
+
 DM_EL_ATT_DU_PR_SE_STRUCTURE = 'DATA_MGMT_dataUtility_security_privacy_elem.json'
 DM_EL_ATT_DU_PR_SE_PROPERTIES_STRUCTURE = 'DATA_MGMT_dataUtility_security_privacy_elem_prop.json'
 DM_METRICS = 'metrics.json'
@@ -236,8 +239,9 @@ class Blueprint:
             api_path = self.vdc_config.get_api_path()
             print('Gathering methods info from API file')
             api = get_dict_from_file(api_path)
-            metrics_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
-            print('Gathering standard metrics from: ' + metrics_path)
+            #metrics_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
+            #metrics_path = DM_JSON_TEMPLATE
+            #print('Gathering standard metrics from: ' + metrics_path)
             #dm_du_pr_se_elem = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER,
             #                                                                   DM_EL_ATT_DU_PR_SE_STRUCTURE)))
             #dm_du_pr_se_elem_prop = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER,
@@ -371,7 +375,8 @@ def generate_api_metrics_files(vdc_repo_path):
         api_path = vdc_config.get_api_path()
         print('Opening api file: ' + api_path)
         api = get_dict_from_file(api_path)
-        metrics_template_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
+        #metrics_template_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
+        metrics_template_path = DM_JSON_TEMPLATE
     except MissingReferenceException as e:
         e.print(VDC_CONFIG)
 
