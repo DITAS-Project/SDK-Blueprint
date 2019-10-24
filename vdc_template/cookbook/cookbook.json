@@ -1,0 +1,92 @@
+{
+	"Resources": {
+		"name": "resource-name",
+		"description": "Resource description",
+		"infrastructures": [{
+				"name": "cloudsigma-infrastructure",
+				"type": "cloud",
+				"provider": {
+					"api_endpoint": "https://fra.cloudsigma.com/api/2.0",
+					"api_type": "Cloudsigma",
+					"credentials": {
+						"username": "apps@ideko.es",
+						"password": "ASK-FOR-IT"
+					},
+					"secret_id": ""
+				},
+				"extra_properties": {
+					"owner": "DataAdministrator"
+				},
+				"resources": [{
+					"name": "resource1",
+					"cpu": 4000,
+					"ram": 4000,
+					"disk": 40000,
+					"drives": [{
+						"name": "resource1-d1",
+						"size": 10000,
+						"type": "SSD"
+					}],
+					"image_id": "image_id",
+					"role": "master",
+					"extra_properties": {
+						"cloudsigma_boot_drive_type": "custom"
+					}
+				}]
+			},
+			{
+				"name": "kubernetes-infrastructure",
+				"type": "edge",
+				"provider": {
+					"api_endpoint": "endpoint",
+					"api_type": "kubernetes",
+					"credentials": {
+						"config": {
+							"apiVersion": "v1",
+							"clusters": [{
+								"cluster": {
+									"certificate-authority-data": "ca-data",
+									"server": "https://ip_removed:36443"
+								},
+								"name": "kubernetes"
+							}],
+							"contexts": [{
+								"context": {
+									"cluster": "kubernetes",
+									"user": "kubernetes-admin"
+								},
+								"name": "kubernetes-admin@kubernetes"
+							}],
+							"current-context": "kubernetes-admin@kubernetes",
+							"kind": "Config",
+							"preferences": {},
+							"users": [{
+								"name": "kubernetes-admin",
+								"user": {
+									"client-certificate-data": "cert-data",
+									"client-key-data": "key-data"
+								}
+							}]
+						},
+						"registries_secret": "secret"
+					}
+				},
+				"extra_properties": {
+					"owner": "ApplicationDeveloper"
+				},
+				"resources": [{
+					"name": "resource2",
+					"cpu": 1830,
+					"ram": 8000,
+					"disk": 480000,
+					"drives": [{
+						"name": "resource2-d1",
+						"size": 10000,
+						"type": "SSD"
+					}],
+					"role": "master"
+				}]
+			}
+		]
+	}
+}
