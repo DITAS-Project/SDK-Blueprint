@@ -1,0 +1,215 @@
+{
+	"dataUtility": [
+		{
+			"id": "availability_90",
+			"description": "Availability 90",
+			"type": "Availability",
+			"properties": {
+				"availability": {
+					"unit": "percentage",
+					"minimum": 90
+				}
+			}
+		},
+		{
+			"id": "consistency_90",
+			"description": "Consistency 90",
+			"type": "Consistency",
+			"properties": {
+				"consistency": {
+					"unit": "percentage",
+					"minimum": 90
+				}
+			}
+		},
+		{
+			"id": "timeliness_65",
+			"description": "Timeliness 65",
+			"type": "Timeliness",
+			"properties": {
+				"timeliness": {
+					"maximum": 65,
+					"unit": "percentage"
+				}
+			}
+		},
+		{
+			"id": "throughput_05",
+			"description": "throughput",
+			"type": "Throughput",
+			"properties": {
+				"throughput": {
+					"minimum": 0.5,
+					"unit": "MB/s"
+				}
+			}
+		},
+		{
+			"id": "precision_08",
+			"description": "Precision 0.8",
+			"type": "Precision",
+			"properties": {
+				"precision": {
+					"maximum": 0.8,
+					"unit": "none"
+				}
+			}
+		},
+		{
+			"id": "accuracy_90",
+			"description": "Accuracy 90",
+			"type": "Accuracy",
+			"properties": {
+				"accuracy": {
+					"minimum": 90,
+					"unit": "percentage"
+				}
+			}
+		},
+		{
+			"id": "responseTime_05",
+			"description": "ResponseTime 0.5",
+			"type": "ResponseTime",
+			"properties": {
+				"responseTime": {
+					"maximum": 0.5,
+					"unit": "second"
+				}
+			}
+		},
+		{
+			"id": "volume_1200",
+			"description": "volume 10000",
+			"type": "Volume",
+			"properties": {
+				"volume": {
+					"value": 10000,
+					"unit": "tuple"
+				}
+			}
+		},
+		{
+			"id": "completeness_8",
+			"description": "Completeness 8",
+			"type": "Process completeness",
+			"properties": {
+				"completeness": {
+					"minimum": 80,
+					"unit": "percentage"
+				}
+			}
+		},
+		{
+			"id": "scaleUpMemory",
+			"description": "scale-up memory",
+			"type": "Scale-up",
+			"properties": {
+				"ramGain": {
+					"unit": "percentage",
+					"value": 130
+				},
+				"ramLimit": {
+					"unit": "percentage",
+					"value": 90
+				}
+			}
+		},
+		{
+			"id": "scaleUpSpace",
+			"description": "scale-up space",
+			"type": "Scale-up",
+			"properties": {
+				"spaceGain": {
+					"unit": "percentage",
+					"value": 110
+				},
+				"spaceLimit": {
+					"unit": "percentage",
+					"value": 95
+				}
+			}
+		}
+	],
+	"security": [
+		{
+			"id": "encryption_AES128",
+			"description": "Encryption AES 128",
+			"type": "TransportEncryption",
+			"properties": {
+				"protocol": {
+					"unit": "enum",
+					"value": "TLS"
+				},
+				"algorithm": {
+					"unit": "list",
+					"value": ["TLS_AES_256_GCM_SHA384", "TLS_AES_128_GCM_SHA256", "TLS_AES_128_CCM_8_SHA256", "TLS_AES_128_CCM_SHA256"]
+				},
+				"keyLength": {
+					"unit": "number",
+					"value": 128
+				}
+			}
+		},
+		{
+			"id": "tracing_1",
+			"description": "Tracing 1",
+			"type": "Tracing",
+			"properties": {
+				"level": {
+					"unit": "enum",
+					"value": "datasource"
+				},
+				"sampleRate": {
+					"unit": "percentage",
+					"value": 1
+				},
+				"instrumentation": {
+					"unit": "enum",
+					"value": "VDC"
+				}
+			}
+		},
+		{
+			"id": "accessControl_direct",
+			"description": "Access Control Direct",
+			"type": "Protocol",
+			"properties": {
+				"required": {
+					"value": "true"
+				},
+				"protocol": {
+					"unit": "enum",
+					"value": "username/password"
+				},
+				"credentials": {
+					"unit": "list",
+					"value": [
+						"researcher_id"
+					]
+				}
+			}
+		}
+
+	],
+	"privacy": [
+		{
+			"id": "purposeControl",
+			"description": "PurposeControl",
+			"type": "PurposeControl",
+			"properties": {
+				"availablePurpose": {
+					"unit": "list",
+					"value": [
+						"purposeTag"
+					]
+				},
+				"allowedGuarantor": {
+					"unit": "list",
+					"value": [
+						"guarantor_id"
+					]
+				}
+			}
+	 	}
+	]
+}
