@@ -6,6 +6,7 @@ from repo import repo
 from blueprint.blueprint import Blueprint
 from blueprint import blueprint as bp
 from distutils.dir_util import copy_tree
+import json
 
 __author__ = "Cataldo Calò, Mirco Manzoni"
 __credits__ = ["Cataldo Calò", "Mirco Manzoni"]
@@ -129,6 +130,11 @@ def handler_repo_init(args):
 
 
 def handler_publish(args):
+    #TODO chiedere se user e password devono andare in un file di config o richiesti a runtime
+    user = 'publicUser'
+    password = 'Blueprint'
+
+
     if not os.path.exists(args.file):
         print("File does not exist!")
         return
@@ -137,8 +143,9 @@ def handler_publish(args):
 
     print("Trying to make a POST to: ", api_endpoint)
     #print("body: ", body)
-    r = requests.post(url=api_endpoint, data=body)
 
+    r = requests.post(url=api_endpoint, data=json.dumps(body), headers={'Content-Type': 'application/json'},
+                      auth=(user, password))
     if r.ok:
         print("Blueprint published successfully.")
     else:
@@ -146,6 +153,7 @@ def handler_publish(args):
 
 
 def handler_unpublish(args):
+    #TODO apportare stesse modifiche della publish per header e auth
     api_endpoint = args.server + '/blueprints'
     print("Trying to make a DELETE to: ", api_endpoint)
     r = requests.delete(url=api_endpoint, data=args.blueprint)
