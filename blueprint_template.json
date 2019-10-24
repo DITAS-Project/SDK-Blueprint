@@ -3,7 +3,7 @@
 		"Overview": {
 			"name": "",
 			"description": "",
-            "tags": [
+			"tags": [
 				{
 					"method_id": "",
 					"tags": []
@@ -28,7 +28,10 @@
 						               }]
 					                   }]
 				                         }]
-				                         }]}]}
+				                     }]
+				}
+			]
+		}
 		,
 		"Flow": {},
 		"DAL_Images": {
