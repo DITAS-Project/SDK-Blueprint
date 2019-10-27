@@ -14,8 +14,6 @@ JSON_TEMPLATES_FOLDER = 'json'
 
 DM_JSON_TEMPLATE = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, 'data_management.json'))
 
-DM_EL_ATT_DU_PR_SE_STRUCTURE = 'DATA_MGMT_dataUtility_security_privacy_elem.json'
-DM_EL_ATT_DU_PR_SE_PROPERTIES_STRUCTURE = 'DATA_MGMT_dataUtility_security_privacy_elem_prop.json'
 DM_METRICS = 'metrics.json'
 DM_METRICS_DATA_UTILITY = 'dataUtility'
 DM_METRICS_PRIVACY = 'privacy'
@@ -49,17 +47,6 @@ IS_TOD_ZIP = 'zip_data'
 DATA_MANAGEMENT_SECTION = 'DATA_MANAGEMENT'
 DM_EL_METHOD_ID = 'method_id'
 DM_EL_ATTRIBUTES = 'attributes'
-DM_EL_ATT_DATA_UTILITY = 'dataUtility'
-DM_EL_ATT_PRIVACY = 'privacy'
-DM_EL_ATT_SECURITY = 'security'
-DM_EL_ATT_DU_PR_SE_ID = 'id'
-DM_EL_ATT_DU_PR_SE_NAME = 'name'
-DM_EL_ATT_DU_PR_SE_TYPE = 'type'
-DM_EL_ATT_DU_PR_SE_PROPERTIES = 'properties'
-DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT = 'unit'
-DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX = 'maximum'
-DM_EL_ATT_DU_PR_SE_PROPERTIES_MIN = 'minimum'
-DM_EL_ATT_DU_PR_SE_PROPERTIES_VALUE = 'value'
 ABSTRACT_PROPERTIES_SECTION = 'ABSTRACT_PROPERTIES'
 COOKBOOK_APPENDIX_SECTION = 'COOKBOOK_APPENDIX'
 EXPOSED_API_SECTION = 'EXPOSED_API'
@@ -239,14 +226,6 @@ class Blueprint:
             api_path = self.vdc_config.get_api_path()
             print('Gathering methods info from API file')
             api = get_dict_from_file(api_path)
-            #metrics_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
-            #metrics_path = DM_JSON_TEMPLATE
-            #print('Gathering standard metrics from: ' + metrics_path)
-            #dm_du_pr_se_elem = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER,
-            #                                                                   DM_EL_ATT_DU_PR_SE_STRUCTURE)))
-            #dm_du_pr_se_elem_prop = get_dict_from_file(os.path.abspath(os.path.join(BLUEPRINT_FOLDER,
-            #                                                                        JSON_TEMPLATES_FOLDER,
-            #                                                                        DM_EL_ATT_DU_PR_SE_PROPERTIES_STRUCTURE)))
 
             data_mgmt_list = []
             for method_raw in api[API_PATHS].keys():
@@ -261,76 +240,7 @@ class Blueprint:
                 print("Gathering metrics of method " + method_raw + " from " + method_metrics_path)
                 metrics = get_dict_from_file(method_metrics_path)
 
-                #print("dm_elem: ", dm_elem)
-                #print("DM_EL_ATTRIBUTES: ", DM_EL_ATTRIBUTES)
-                #print("metrics: ", metrics)
-
                 dm_elem[DM_EL_ATTRIBUTES] = copy.deepcopy(metrics)
-
-                '''
-                # Fill dataUtility elements
-                for metric in metrics[METRICS_ROOT][DM_METRICS_DATA_UTILITY]:
-                    # Extract template as a copy of the structure taken from file
-                    dm_metric_elem = copy.deepcopy(dm_du_pr_se_elem)
-                    dm_metric_elem_prop = copy.deepcopy(dm_du_pr_se_elem_prop)
-                    # Fill the structure
-                    print("metric: ", metric)
-                    print("dm_metric_elem: ", dm_metric_elem)
-                    print("METRIC_NAME: ", METRIC_NAME)
-                    print("DM_EL_ATT_DU_PR_SE_ID: ", DM_EL_ATT_DU_PR_SE_ID)
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_ID] = metric[METRIC_NAME]
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_NAME] = metric[METRIC_NAME]
-                    # TODO: what goes into 'type' property?
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_TYPE] = metric[METRIC_NAME]
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_PROPERTIES] = metric[METRIC_NAME]
-
-                    #dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT] = metric[METRIC_UNIT]
-                    #dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX] = metric[METRIC_MAXIMUM]
-                    #dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MIN] = metric[METRIC_MINIMUM]
-                    # TODO: where to get the metrics value??
-                    #dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_VALUE] = metric[METRIC_UNIT]
-
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_PROPERTIES] = {metric[METRIC_NAME]: dm_metric_elem_prop}
-                    dm_elem[DM_EL_ATTRIBUTES][DM_EL_ATT_DATA_UTILITY].append(dm_metric_elem)
-
-                # Fill privacy elements
-                for metric in metrics[METRICS_ROOT][DM_METRICS_PRIVACY]:
-                    # Extract template as a copy of the structure taken from file
-                    dm_metric_elem = copy.deepcopy(dm_du_pr_se_elem)
-                    dm_metric_elem_prop = copy.deepcopy(dm_du_pr_se_elem_prop)
-                    # Fill the structure
-                    print("metric: ", metric)
-                    print("Trying to access key METRIC_NAME=", METRIC_NAME)
-                    temp_value = metric[METRIC_NAME]
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_ID] = temp_value
-                    # TODO: name and type missing
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT] = metric[METRIC_UNIT]
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX] = metric[METRIC_MAXIMUM]
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MIN] = metric[METRIC_MINIMUM]
-                    # TODO: where to get the metrics value??
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_VALUE] = metric[METRIC_UNIT]
-
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_PROPERTIES] = {metric[METRIC_NAME]: dm_metric_elem_prop}
-                    dm_elem[DM_EL_ATTRIBUTES][DM_EL_ATT_PRIVACY].append(dm_metric_elem)
-
-                # Fill security elements
-                for metric in metrics[METRICS_ROOT][DM_METRICS_SECURITY]:
-                    # Extract template as a copy of the structure taken from file
-                    dm_metric_elem = copy.deepcopy(dm_du_pr_se_elem)
-                    dm_metric_elem_prop = copy.deepcopy(dm_du_pr_se_elem_prop)
-                    # Fill the structure
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_ID] = metric[METRIC_NAME]
-                    # TODO: name and type missing
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_UNIT] = metric[METRIC_UNIT]
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MAX] = metric[METRIC_MAXIMUM]
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_MIN] = metric[METRIC_MINIMUM]
-                    # TODO: where to get the metrics value??
-                    dm_metric_elem_prop[DM_EL_ATT_DU_PR_SE_PROPERTIES_VALUE] = metric[METRIC_UNIT]
-
-                    dm_metric_elem[DM_EL_ATT_DU_PR_SE_PROPERTIES] = {metric[METRIC_NAME]: dm_metric_elem_prop}
-                    dm_elem[DM_EL_ATTRIBUTES][DM_EL_ATT_SECURITY].append(dm_metric_elem)
-
-                '''
                 data_mgmt_list.append(dm_elem)
 
             self.bp[DATA_MANAGEMENT_SECTION] = data_mgmt_list
