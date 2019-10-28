@@ -1,0 +1,5 @@
+std-metrics
+- se data-management è indicata nel .cfg il path deve essere valido,
+  oppure va cancellata proprio l'attributo
+  -> Cataldo: gestite diversamente le eccezioni, definiti dei valori
+              illegali per i path. Da testare meglio
