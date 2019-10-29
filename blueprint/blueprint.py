@@ -44,6 +44,9 @@ IS_FLOW_SOURCE = 'source'
 IS_TESTING_OUTPUT_DATA = 'Testing_Output_Data'
 IS_TOD_METHODID = 'method_id'
 IS_TOD_ZIP = 'zip_data'
+IS_METHODS_INPUT = 'Methods_Input'
+IS_MI_METHODS = 'Methods'
+IS_MI_METHODS_METHODID = 'method_id'
 DATA_MANAGEMENT_SECTION = 'DATA_MANAGEMENT'
 DM_EL_METHOD_ID = 'method_id'
 DM_EL_ATTRIBUTES = 'attributes'
@@ -248,6 +251,26 @@ class Blueprint:
             print('API file corrupted!\nCannot extract methods info from API file')
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
+
+
+    def add_is_methods_input(self):
+        try:
+            path = self.vdc_config.get_api_path()
+            print('Gathering methods info from API file')
+            api = get_dict_from_file(path)
+            methods_input = []
+
+            for method in api[API_PATHS].keys():
+                #print("Found method: ", method.strip("/"))
+                mi_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_METHODS_INPUT][IS_MI_METHODS][0])
+                mi_template[IS_MI_METHODS_METHODID] = method.strip("/")
+                methods_input.append(mi_template)
+            self.bp[INTERNAL_STRUCTURE_SECTION][IS_METHODS_INPUT][IS_MI_METHODS] = methods_input
+        except TypeError:
+            print('API file corrupted!\nCannot extract methods info from API file')
+        except MissingReferenceException as e:
+            e.print(VDC_CONFIG)
+
 
     def save(self):
         file_path = self.vdc_config.get_blueprint_path()

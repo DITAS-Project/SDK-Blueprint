@@ -30,6 +30,7 @@ def generate_blueprint(vdc_repo, vdc_path, dal_paths, update, push):
     blueprint.add_is_tags()
     blueprint.add_is_flow()
     blueprint.add_is_testing_output_data()
+    blueprint.add_is_methods_input()
     blueprint.add_cookbook()
     blueprint.add_exposed_api()
     blueprint.add_is_data_sources()

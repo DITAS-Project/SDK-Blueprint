@@ -3,7 +3,7 @@
 		"Overview": {
 			"name": "",
 			"description": "",
-            "tags": [
+			"tags": [
 				{
 					"method_id": "",
 					"tags": []
@@ -15,10 +15,24 @@
 			"Methods": [
 				{
 					"method_id": "",
-					"data_sources": []
+					"data_sources": [{
+				            "dataSource_id": "",
+				            "dataSource_type": "",
+				            "database": [{
+					        "database_id": "",
+					        "tables": [{
+						    "table_id": "",
+						    "columns": [{
+							"column_id": "",
+							"computeDataUtility": true
+						               }]
+					                   }]
+				                         }]
+				                     }]
 				}
-            ]
-		},
+			]
+		}
+		,
 		"Flow": {},
 		"DAL_Images": {
 
