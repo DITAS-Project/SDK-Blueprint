@@ -265,7 +265,6 @@ class Blueprint:
         except InvalidRootDirectory as e:
             e.print(VDC_CONFIG)
 
-
     def add_is_methods_input(self):
         try:
             path = self.vdc_config.get_api_path()
@@ -283,7 +282,6 @@ class Blueprint:
             print('API file corrupted!\nCannot extract methods info from API file')
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
-
 
     def save(self):
         file_path = self.vdc_config.get_blueprint_path()
