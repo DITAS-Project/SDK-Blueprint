@@ -6,8 +6,7 @@ import yaml
 import re
 from blueprint.config_file.vdc_configfile import VDCConfigFile
 from blueprint.config_file.dal_configfile import DALConfigFile
-from blueprint.config_file.configfile import MissingReferenceException
-
+from blueprint.config_file.configfile import MissingReferenceException, InvalidRootDirectory
 
 BLUEPRINT_FOLDER = 'blueprint'
 JSON_TEMPLATES_FOLDER = 'json'
@@ -84,22 +83,23 @@ class Blueprint:
         # loading vdc_config_file
         try:
             self.vdc_config = VDCConfigFile(vdc_repo_path, VDC_CONFIG)
+            # TODO: Could the constructor of VDCConfigFile actually raise this exceptions??
         except MissingReferenceException:
-            raise FileNotFoundError('Missing file ' + VDC_CONFIG + 'in repo ' + vdc_repo_path)
+            print('ERROR: Missing file ' + VDC_CONFIG + 'in repo ' + vdc_repo_path)
 
         # loading dal_config_file
         self.dal_configs = []
         for path in dal_repo_paths:
             try:
                 self.dal_configs.append(DALConfigFile(path, DAL_CONFIG))
+                # TODO: Could the constructor of DALConfigFile actually raise this exceptions??
             except MissingReferenceException:
-                raise FileNotFoundError('Missing file ' + DAL_CONFIG + 'in repo ' + path)
+                print('ERROR: Missing file ' + DAL_CONFIG + 'in repo ' + path)
 
         # if method update the bp file is loaded from the configuration file
         if update:
             print("Trying to open existing blueprint at " + self.vdc_config.get_blueprint_path())
             self.bp = get_dict_from_file(self.vdc_config.get_blueprint_path())
-
 
     def add_exposed_api(self):
         try:
@@ -107,6 +107,8 @@ class Blueprint:
             print('Opening api file: ' + path)
             self.bp[EXPOSED_API_SECTION] = get_dict_from_file(path)
         except MissingReferenceException as e:
+            e.print(VDC_CONFIG)
+        except InvalidRootDirectory as e:
             e.print(VDC_CONFIG)
 
     def add_is_tags(self):
@@ -117,7 +119,7 @@ class Blueprint:
             tags = []
 
             for method in api[API_PATHS].keys():
-                #print("Found method: ", method.strip("/"))
+                # print("Found method: ", method.strip("/"))
                 tag_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS][0])
                 tag_template[IS_OW_TAGS_METHODID] = method.strip("/")
                 tags.append(tag_template)
@@ -125,6 +127,8 @@ class Blueprint:
         except TypeError:
             print('API file corrupted!\nCannot extract methods info from API file')
         except MissingReferenceException as e:
+            e.print(VDC_CONFIG)
+        except InvalidRootDirectory as e:
             e.print(VDC_CONFIG)
 
     def add_is_flow(self):
@@ -147,11 +151,15 @@ class Blueprint:
                 self.bp[INTERNAL_STRUCTURE_SECTION][IS_FLOW] = flow
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
+        except InvalidRootDirectory as e:
+            e.print(VDC_CONFIG)
 
     def add_cookbook(self):
         try:
             self.bp[COOKBOOK_APPENDIX_SECTION] = get_dict_from_file(self.vdc_config.get_cookbook_path())
         except MissingReferenceException as e:
+            e.print(VDC_CONFIG)
+        except InvalidRootDirectory as e:
             e.print(VDC_CONFIG)
 
     def add_is_testing_output_data(self):
@@ -176,6 +184,8 @@ class Blueprint:
                 outdata.append(outdata_template)
             self.bp[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA] = outdata
         except MissingReferenceException as e:
+            e.print(VDC_CONFIG)
+        except InvalidRootDirectory as e:
             e.print(VDC_CONFIG)
 
     def add_is_data_sources(self):
@@ -218,10 +228,11 @@ class Blueprint:
                                 imported_file = matches.group(1)
                                 if imported_file not in imports:
                                     imports.append(imported_file)
-                    # TODO: do something with the whole the content of the file (file_content)
                     data_sources[proto] = file_content
             except MissingReferenceException as e:
                 e.print(dal_config.repo_name)
+            except InvalidRootDirectory as e:
+                e.print(VDC_CONFIG)
         self.bp[INTERNAL_STRUCTURE_SECTION][IS_DATA_SOURCES] = data_sources
 
     def add_data_management(self):
@@ -251,7 +262,8 @@ class Blueprint:
             print('API file corrupted!\nCannot extract methods info from API file')
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
-
+        except InvalidRootDirectory as e:
+            e.print(VDC_CONFIG)
 
     def add_is_methods_input(self):
         try:
@@ -270,7 +282,6 @@ class Blueprint:
             print('API file corrupted!\nCannot extract methods info from API file')
         except MissingReferenceException as e:
             e.print(VDC_CONFIG)
-
 
     def save(self):
         file_path = self.vdc_config.get_blueprint_path()
@@ -300,30 +311,33 @@ def generate_api_metrics_files(vdc_repo_path):
     # loading vdc_config_file
     try:
         vdc_config = VDCConfigFile(vdc_repo_path, VDC_CONFIG)
+        # TODO: Could the constructor of VDCConfigFile actually raise those exceptions??
     except MissingReferenceException:
-        raise FileNotFoundError('Missing file ' + VDC_CONFIG + 'in repo ' + vdc_repo_path)
+        print('ERROR: Missing file ' + VDC_CONFIG + 'in repo ' + vdc_repo_path)
 
     # Retrieving API file
     try:
         api_path = vdc_config.get_api_path()
         print('Opening api file: ' + api_path)
         api = get_dict_from_file(api_path)
-        #metrics_template_path = os.path.abspath(os.path.join(BLUEPRINT_FOLDER, JSON_TEMPLATES_FOLDER, DM_METRICS))
         metrics_template_path = DM_JSON_TEMPLATE
+
+        # For each method create a file with method name as prefix and
+        # copy the whole list of standard metrics as content
+        for method_raw in api[API_PATHS].keys():
+            method = method_raw.strip("/")
+            method = method.replace("/", "-")
+            print("Creating metrics file for method '" + method + "'")
+            data_mgmt_path = vdc_config.get_data_management_path()
+            method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, method + "_metrics.json"))
+
+            print("metrics_template_path", metrics_template_path)
+            print("method_metrics_path", method_metrics_path)
+
+            with open(metrics_template_path, "r") as source, open(method_metrics_path, "w") as destination:
+                destination.write(source.read())
+
     except MissingReferenceException as e:
         e.print(VDC_CONFIG)
-
-    # For each method create a file with method name as prefix and
-    # copy the whole list of standard metrics as content
-    for method_raw in api[API_PATHS].keys():
-        method = method_raw.strip("/")
-        method = method.replace("/", "-")
-        print("Creating metrics file for method '" + method + "'")
-        data_mgmt_path = vdc_config.get_data_management_path()
-        method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, method + "_metrics.json"))
-
-        print("metrics_template_path", metrics_template_path)
-        print("method_metrics_path", method_metrics_path)
-
-        with open(metrics_template_path, "r") as source, open(method_metrics_path, "w") as destination:
-            destination.write(source.read())
+    except InvalidRootDirectory as e:
+        e.print(VDC_CONFIG)
