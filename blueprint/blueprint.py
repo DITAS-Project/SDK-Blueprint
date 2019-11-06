@@ -211,7 +211,7 @@ class Blueprint:
                                 imports.append(imported_file)
                 main_proto_file_name = os.path.basename(dal_config.get_main_proto())
                 #data_sources[main_proto_file_name] = file_content
-                data_sources.push({main_proto_file_name: file_content})
+                data_sources.append({main_proto_file_name: file_content})
 
                 # For each imported file, recursively look for imports statement
                 for proto in imports:
@@ -229,7 +229,7 @@ class Blueprint:
                                 if imported_file not in imports:
                                     imports.append(imported_file)
                     #data_sources[proto] = file_content
-                    data_sources.push({proto: file_content})
+                    data_sources.append({proto: file_content})
             except MissingReferenceException as e:
                 e.print(dal_config.repo_name)
             except InvalidRootDirectory as e:
