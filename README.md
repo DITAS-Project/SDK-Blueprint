@@ -9,11 +9,16 @@ This is the DITAS SDK CLI to generate a BluePrint starting from VDC and DALs rep
 - A github account with read/write access to DITAS projects
 - A personal access token for git CLI: refer to the official 
 [guide](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line)
-- Create a file `github_access.json` (a file with this name will be ignored by git, because of the related entry in the 
+- Credentials to publish and unpublish blueprints on the iccs repository
+- Create a file `secrets.json` (a file with this name will be ignored by git, because of the related entry in the 
 `.gitignore` file) in the main folder with the following structure
 ```
 {
-	"access_token": "{your access token}"
+	"access_token": "{your access token}",
+	"iccs_account": {
+			"user":"",
+			"password":""
+			}
 }
 ```
 

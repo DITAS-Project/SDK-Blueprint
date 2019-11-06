@@ -1,5 +1,5 @@
 # File containing github access token
-github_access.json
+secrets.json
 
 # Folder containing downloaded repositories
 tmp/

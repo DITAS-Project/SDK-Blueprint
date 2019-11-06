@@ -22,6 +22,8 @@ VDC_TEMPLATE_COMMIT = 'VDC template commit'
 DAL_TEMPLATE_COMMIT = 'DAL template commit'
 BLUEPRINT_COMMIT = 'Blueprint commit'
 
+PUBLISH_ID = 'blueprint_id'
+
 
 def generate_blueprint(vdc_repo, vdc_path, dal_paths, update, push):
     # Do something
@@ -131,11 +133,6 @@ def handler_repo_init(args):
 
 
 def handler_publish(args):
-    #TODO chiedere se user e password devono andare in un file di config o richiesti a runtime
-    user = 'publicUser'
-    password = 'Blueprint'
-
-
     if not os.path.exists(args.file):
         print("File does not exist!")
         return
@@ -143,22 +140,21 @@ def handler_publish(args):
     api_endpoint = args.server + '/blueprints'
 
     print("Trying to make a POST to: ", api_endpoint)
-    #print("body: ", body)
 
     r = requests.post(url=api_endpoint, data=json.dumps(body), headers={'Content-Type': 'application/json'},
-                      auth=(user, password))
+                      auth=repo.get_iccs_crendetials())
     if r.ok:
         print("Blueprint published successfully.")
+        print('The ID of the published blueprint is ' + json.loads(r.content)[PUBLISH_ID][0])
     else:
         print(r.status_code)
+        print(r.content)
 
 
 def handler_unpublish(args):
-    #TODO apportare stesse modifiche della publish per header e auth
-    api_endpoint = args.server + '/blueprints'
+    api_endpoint = args.server + '/blueprints/' + args.blueprint
     print("Trying to make a DELETE to: ", api_endpoint)
-    r = requests.delete(url=api_endpoint, data=args.blueprint)
-
+    r = requests.delete(url=api_endpoint, auth=repo.get_iccs_crendetials())
     if r.ok:
         print("Blueprint unpublished successfully.")
     else:

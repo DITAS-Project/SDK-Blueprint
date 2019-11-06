@@ -3,7 +3,7 @@ import json
 import os
 import requests
 
-GH_ACCESS_FILE='github_access.json'
+GH_ACCESS_FILE='secrets.json'
 GH_ORG_DITAS = 'DITAS-Project'
 
 
@@ -65,3 +65,10 @@ def create_ditas_repo(repo_name):
     }
     response = requests.post(url, json=body, headers=headers)
     return response.json()
+
+
+def get_iccs_crendetials():
+    iccs_file_path = os.path.join(os.getcwd(), GH_ACCESS_FILE)
+    with open(iccs_file_path) as access_file:
+        credentials = json.load(access_file)['iccs_account']
+    return credentials['user'], credentials['password']
