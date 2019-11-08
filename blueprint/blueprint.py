@@ -190,7 +190,7 @@ class Blueprint:
 
     def add_is_data_sources(self):
         # Copy the content of proto files
-        data_sources = {}
+        data_sources = []
         for dal_config in self.dal_configs:
             imports = []
             # Parse the main proto file looking for all the imports statement
@@ -209,9 +209,9 @@ class Blueprint:
                             if imported_file not in imports:
                                 print("Adding " + imported_file)
                                 imports.append(imported_file)
-                # TODO: do something with the whole the content of the file (file_content)
                 main_proto_file_name = os.path.basename(dal_config.get_main_proto())
-                data_sources[main_proto_file_name] = file_content
+                #data_sources[main_proto_file_name] = file_content
+                data_sources.append({main_proto_file_name: file_content})
 
                 # For each imported file, recursively look for imports statement
                 for proto in imports:
@@ -228,7 +228,8 @@ class Blueprint:
                                 imported_file = matches.group(1)
                                 if imported_file not in imports:
                                     imports.append(imported_file)
-                    data_sources[proto] = file_content
+                    #data_sources[proto] = file_content
+                    data_sources.append({proto: file_content})
             except MissingReferenceException as e:
                 e.print(dal_config.repo_name)
             except InvalidRootDirectory as e:
