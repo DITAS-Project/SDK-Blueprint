@@ -3,7 +3,7 @@
 		"Overview": {
 			"name": "",
 			"description": "",
-            "tags": [
+			"tags": [
 				{
 					"method_id": "",
 					"tags": [""]
@@ -28,18 +28,33 @@
 						               }]
 					                   }]
 				                         }]
-				                         }]}]}
+				                     }]
+				}
+			]
+		}
 		,
 		"Flow": {},
 		"DAL_Images": {
-
+			"dal_image": {
+				"internalPort": 30100,
+				"externalPort": 30100,
+				"image": "dockerrepo_ip:5050/image_name",
+				"original_ip": "original_ip"
+				}
 		},
 		"VDC_Images": {
-
+			"vdc_image": {
+				"internalPort": 1888,
+				"externalPort": 1888,
+				"image": "dockerrepo_ip:5050/image_name"
+				}
 		},
 		"Identity_Access_Management": {
 			"jwks_uri": "",
-			"iam_endpoint": ""
+			"iam_endpoint": "",
+			"roles":[
+				"role"
+				]
 		},
 		"Testing_Output_Data": [
 			{
