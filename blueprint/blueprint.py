@@ -119,9 +119,9 @@ class Blueprint:
             tags = []
 
             for method in api[API_PATHS].keys():
-                # print("Found method: ", method.strip("/"))
+                operation_id = find_op_id(api[API_PATHS][method])
                 tag_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS][0])
-                tag_template[IS_OW_TAGS_METHODID] = method.strip("/")
+                tag_template[IS_OW_TAGS_METHODID] = operation_id
                 tags.append(tag_template)
             self.bp[INTERNAL_STRUCTURE_SECTION][IS_OVERVIEW][IS_OW_TAGS] = tags
         except TypeError:
@@ -170,9 +170,9 @@ class Blueprint:
             print('Zip files at ' + zip_path)
             for method in api[API_PATHS].keys():
                 outdata_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA][0])
-                method = method.strip("/")
-                outdata_template[IS_TOD_METHODID] = method
-                zip_file = os.path.join(zip_path, method.replace("/", "-") + ZIP_FORMAT)
+                operation_id = find_op_id(api[API_PATHS][method])
+                outdata_template[IS_TOD_METHODID] = operation_id
+                zip_file = os.path.join(zip_path, operation_id + ZIP_FORMAT)
                 print('Searching for ' + zip_file)
                 if os.path.exists(zip_file):
                     print('Zip file found!')
@@ -190,7 +190,7 @@ class Blueprint:
 
     def add_is_data_sources(self):
         # Copy the content of proto files
-        data_sources = {}
+        data_sources = []
         for dal_config in self.dal_configs:
             imports = []
             # Parse the main proto file looking for all the imports statement
@@ -209,9 +209,9 @@ class Blueprint:
                             if imported_file not in imports:
                                 print("Adding " + imported_file)
                                 imports.append(imported_file)
-                # TODO: do something with the whole the content of the file (file_content)
                 main_proto_file_name = os.path.basename(dal_config.get_main_proto())
-                data_sources[main_proto_file_name] = file_content
+                #data_sources[main_proto_file_name] = file_content
+                data_sources.append({main_proto_file_name: file_content})
 
                 # For each imported file, recursively look for imports statement
                 for proto in imports:
@@ -228,7 +228,8 @@ class Blueprint:
                                 imported_file = matches.group(1)
                                 if imported_file not in imports:
                                     imports.append(imported_file)
-                    data_sources[proto] = file_content
+                    #data_sources[proto] = file_content
+                    data_sources.append({proto: file_content})
             except MissingReferenceException as e:
                 e.print(dal_config.repo_name)
             except InvalidRootDirectory as e:
@@ -243,15 +244,14 @@ class Blueprint:
 
             data_mgmt_list = []
             for method_raw in api[API_PATHS].keys():
-                method_raw = method_raw.strip("/")
-                method = method_raw.replace("/", "-")
+                operation_id = find_op_id(api[API_PATHS][method_raw])
                 dm_elem = copy.deepcopy(self.template[DATA_MANAGEMENT_SECTION][0])
-                dm_elem[DM_EL_METHOD_ID] = method_raw
+                dm_elem[DM_EL_METHOD_ID] = operation_id
                 # Fill ATTRIBUTES section of each method element
                 data_mgmt_path = self.vdc_config.get_data_management_path()
-                method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, method + "_metrics.json"))
+                method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, operation_id + "_metrics.json"))
 
-                print("Gathering metrics of method " + method_raw + " from " + method_metrics_path)
+                print("Gathering metrics of operation " + operation_id + " from " + method_metrics_path)
                 metrics = get_dict_from_file(method_metrics_path)
 
                 dm_elem[DM_EL_ATTRIBUTES] = copy.deepcopy(metrics)
@@ -274,8 +274,9 @@ class Blueprint:
 
             for method in api[API_PATHS].keys():
                 #print("Found method: ", method.strip("/"))
+                operation_id = find_op_id(api[API_PATHS][method])
                 mi_template = copy.deepcopy(self.template[INTERNAL_STRUCTURE_SECTION][IS_METHODS_INPUT][IS_MI_METHODS][0])
-                mi_template[IS_MI_METHODS_METHODID] = method.strip("/")
+                mi_template[IS_MI_METHODS_METHODID] = operation_id
                 methods_input.append(mi_template)
             self.bp[INTERNAL_STRUCTURE_SECTION][IS_METHODS_INPUT][IS_MI_METHODS] = methods_input
         except TypeError:
@@ -325,14 +326,13 @@ def generate_api_metrics_files(vdc_repo_path):
         # For each method create a file with method name as prefix and
         # copy the whole list of standard metrics as content
         for method_raw in api[API_PATHS].keys():
-            method = method_raw.strip("/")
-            method = method.replace("/", "-")
-            print("Creating metrics file for method '" + method + "'")
+            operation_id = find_op_id(api[API_PATHS][method_raw])
+            print("Creating metrics file for operation '" + operation_id + "'")
             data_mgmt_path = vdc_config.get_data_management_path()
-            method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, method + "_metrics.json"))
+            method_metrics_path = os.path.abspath(os.path.join(data_mgmt_path, operation_id + "_metrics.json"))
 
-            print("metrics_template_path", metrics_template_path)
-            print("method_metrics_path", method_metrics_path)
+            # print("metrics_template_path", metrics_template_path)
+            # print("method_metrics_path", method_metrics_path)
 
             with open(metrics_template_path, "r") as source, open(method_metrics_path, "w") as destination:
                 destination.write(source.read())
@@ -341,3 +341,19 @@ def generate_api_metrics_files(vdc_repo_path):
         e.print(VDC_CONFIG)
     except InvalidRootDirectory as e:
         e.print(VDC_CONFIG)
+
+
+# For each method structure, find the corresponding operationId attribute
+# for whatsoever HTTP method
+
+def find_op_id(j):
+    if isinstance(j, dict):
+        if 'operationId' in j:
+            return j['operationId']
+        for v in j.values():
+            r = find_op_id(v)
+            if r: return r
+    if isinstance(j, list):
+        for e in j:
+            r = find_op_id(e)
+            if r: return r
