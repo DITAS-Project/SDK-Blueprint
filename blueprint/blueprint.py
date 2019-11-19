@@ -36,6 +36,7 @@ IS_OVERVIEW = 'Overview'
 IS_OW_TAGS = 'tags'
 IS_OW_TAGS_METHODID = 'method_id'
 IS_DATA_SOURCES = "Data_Sources"
+DATA_SOURCES_SCHEMA = "schema"
 IS_FLOW = 'Flow'
 IS_FLOW_PLATFORM = 'platform'
 IS_FLOW_PARAMS = 'parameters'
@@ -192,34 +193,20 @@ class Blueprint:
         # Copy the content of proto files
         data_sources = []
         for dal_config in self.dal_configs:
-            imports = []
-            # Parse the main proto file looking for all the imports statement
-            file_content = ""
+            print('#####################################################################################')
             try:
-                with open(dal_config.get_path_from_main_proto(), 'r') as main_proto:
-                    main_proto_folder = os.path.abspath(os.path.join(dal_config.get_path_from_main_proto(), os.pardir))
-                    print("main_proto_folder: " + main_proto_folder)
-                    file_lines = main_proto.readlines()
-                    for line in file_lines:
-                        file_content += line
-                        matches = re.match(r'import "(.*)";', line)
-                        if matches:
-                            # line is an import statement
-                            imported_file = matches.group(1)
-                            if imported_file not in imports:
-                                print("Adding " + imported_file)
-                                imports.append(imported_file)
-                main_proto_file_name = os.path.basename(dal_config.get_main_proto())
-                #data_sources[main_proto_file_name] = file_content
-                data_sources.append({main_proto_file_name: file_content})
-
-                # For each imported file, recursively look for imports statement
-                for proto in imports:
+                for i in range(dal_config.count_sources()):
+                    imports = []
                     file_content = ""
-                    subproto_file = os.path.join(main_proto_folder, proto)
-                    print("Opening sub-proto file: " + subproto_file)
-                    with open(subproto_file, 'r') as proto_file:
-                        file_lines = proto_file.readlines()
+                    schema = []
+
+                    data_source = get_dict_from_file(dal_config.get_path_from_source(i))
+
+                    # Parse the main proto file looking for all the imports statement
+                    with open(dal_config.get_path_from_main_proto(i), 'r') as main_proto:
+                        main_proto_folder = os.path.abspath(os.path.join(dal_config.get_path_from_main_proto(i), os.pardir))
+                        print("main_proto_folder: " + main_proto_folder)
+                        file_lines = main_proto.readlines()
                         for line in file_lines:
                             file_content += line
                             matches = re.match(r'import "(.*)";', line)
@@ -227,9 +214,31 @@ class Blueprint:
                                 # line is an import statement
                                 imported_file = matches.group(1)
                                 if imported_file not in imports:
+                                    print("Adding " + imported_file)
                                     imports.append(imported_file)
-                    #data_sources[proto] = file_content
-                    data_sources.append({proto: file_content})
+                    main_proto_file_name = os.path.basename(dal_config.get_main_proto(i))
+                    #data_sources[main_proto_file_name] = file_content
+                    schema.append({main_proto_file_name: file_content})
+
+                    # For each imported file, recursively look for imports statement
+                    for proto in imports:
+                        file_content = ""
+                        subproto_file = os.path.join(main_proto_folder, proto)
+                        print("Opening sub-proto file: " + subproto_file)
+                        with open(subproto_file, 'r') as proto_file:
+                            file_lines = proto_file.readlines()
+                            for line in file_lines:
+                                file_content += line
+                                matches = re.match(r'import "(.*)";', line)
+                                if matches:
+                                    # line is an import statement
+                                    imported_file = matches.group(1)
+                                    if imported_file not in imports:
+                                        imports.append(imported_file)
+                        #data_sources[proto] = file_content
+                        schema.append({proto: file_content})
+                    data_source[DATA_SOURCES_SCHEMA] = schema
+                    data_sources.append(data_source)
             except MissingReferenceException as e:
                 e.print(dal_config.repo_name)
             except InvalidRootDirectory as e:

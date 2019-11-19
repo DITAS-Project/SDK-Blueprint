@@ -58,7 +58,7 @@ def generate_blueprint(vdc_repo, vdc_path, dal_paths, update, push):
     blueprint.add_cookbook()
     blueprint.add_exposed_api()
     blueprint.add_is_data_sources()
-    blueprint.add_data_management()
+    #blueprint.add_data_management()
     blueprint.save()
     print('Blueprint created')
     if push:
