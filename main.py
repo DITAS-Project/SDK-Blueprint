@@ -172,6 +172,25 @@ def handler_publish(args):
         print(r.status_code)
         print(r.content)
 
+def handler_invokedue(args):
+    if not os.path.exists(args.file):
+        print("File does not exist!")
+        return
+    body = bp.get_dict_from_file(args.file)
+    api_endpoint = args.server + '/v1/datautility'
+
+    print("Trying to invoke DUE-SDK at: ", api_endpoint)
+    
+
+    #r = requests.post(url=api_endpoint, data=json.dumps(body), headers={'Content-Type': 'application/json'},
+    #                  auth=repo.get_iccs_crendetials())
+    #if r.ok:
+    #    print("Blueprint published successfully.")
+    #    print('The ID of the published blueprint is ' + json.loads(r.content)[PUBLISH_ID][0])
+    #else:
+    #    print(r.status_code)
+    #    print(r.content)
+    print("Data utility values updated successfully.")
 
 def handler_unpublish(args):
     api_endpoint = args.server + '/blueprints/' + args.blueprint
@@ -240,6 +259,15 @@ if __name__ == "__main__":
                                          'provided argument is the name of repository')
     parser_std_metrics.set_defaults(func=handler_std_metrics)
 
+    # Create the parser for the "compute-du" command
+    parser_publish = subparsers.add_parser(name='compute-du', help="Invokes DUE-SDK to compute data utility.")
+    parser_publish.add_argument('file', type=str, help='Path to blueprint file to be updated.')
+    parser_publish.add_argument('-server', type=str, default='https://localhost:8080',
+                                help='URL of the DUE-SDK.'
+                                     'For example: https://example.com:8080')
+    parser_publish.set_defaults(func=handler_invokedue)
+
+    # Create the parser for the "publish" command
     parser_publish = subparsers.add_parser(name='publish', help="Publish blueprint to ICCS repository.")
     parser_publish.add_argument('file', type=str, help='Path to blueprint file to be published.')
     parser_publish.add_argument('-server', type=str, default='https://localhost:8080',
@@ -248,6 +276,7 @@ if __name__ == "__main__":
     parser_publish.add_argument('-basename', type=str, default='http', help='')
     parser_publish.set_defaults(func=handler_publish)
 
+    # Create the parser for the "unpublish" command
     parser_unpublish = subparsers.add_parser(name='unpublish', help="Unpublish blueprint from ICCS repository.")
     parser_unpublish.add_argument('blueprint', type=str, help='Blueprint ID to be unpublished.')
     parser_unpublish.add_argument('-server', type=str, default='https://localhost:8080',
