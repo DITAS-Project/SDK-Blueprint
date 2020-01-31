@@ -177,20 +177,21 @@ def handler_invokedue(args):
         print("File does not exist!")
         return
     body = bp.get_dict_from_file(args.file)
-    api_endpoint = args.server + '/v1/datautility'
+    #api_endpoint = args.server + '/v1/datautility'
+    #for debug only, remove once DUE-SDK API are standardized
+    api_endpoint = args.server + '/ditas-project/DataUtilityEvaluator/1.0/datautility'
 
     print("Trying to invoke DUE-SDK at: ", api_endpoint)
     
 
-    #r = requests.post(url=api_endpoint, data=json.dumps(body), headers={'Content-Type': 'application/json'},
-    #                  auth=repo.get_iccs_crendetials())
-    #if r.ok:
-    #    print("Blueprint published successfully.")
-    #    print('The ID of the published blueprint is ' + json.loads(r.content)[PUBLISH_ID][0])
-    #else:
-    #    print(r.status_code)
-    #    print(r.content)
-    print("Data utility values updated successfully.")
+    r = requests.post(url=api_endpoint, data=json.dumps(body), headers={'Content-Type': 'application/json'})
+    if r.ok:
+        print("Data utility values updated successfully.")
+        with open(args.file, 'w') as outfile:
+            json.dump(json.loads(r.content), outfile, indent=4)
+    else:
+        print(r.status_code)
+        print(r.content)
 
 def handler_unpublish(args):
     api_endpoint = args.server + '/blueprints/' + args.blueprint

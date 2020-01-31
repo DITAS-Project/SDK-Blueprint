@@ -181,7 +181,8 @@ class Blueprint:
                                                                 method.replace("/", "-") + ZIP_FORMAT)
                 else:
                     print('Zip file not found!')
-                    outdata_template[IS_TOD_ZIP] = ''
+                    print('Default Zip location added')
+                    outdata_template[IS_TOD_ZIP] = 'https://github.com/DITAS-Project/data-utility-evaluator/blob/master/dataset/getNutritionalData.zip?raw=true'
                 outdata.append(outdata_template)
             self.bp[INTERNAL_STRUCTURE_SECTION][IS_TESTING_OUTPUT_DATA] = outdata
         except MissingReferenceException as e:
